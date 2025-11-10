@@ -76,10 +76,12 @@ Future Direction (if needed)
 ---
 
 Open Project
+
 NOLE is **open-source** and built for shared learning.  
 As development continues, a license and contributor guidelines will be added.
 
 ---
 
 Thank You
+
 To everyone who supports kids who learn deeply, differently, and with their whole hearts.
