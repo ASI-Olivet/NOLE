@@ -51,7 +51,11 @@ Phase 1 — Tampa Bay Explorer (Current focus)
 - Optional dyslexia-friendly font
 - No sudden motion or visual noise
 
-
+### Add Ship Data
+- ** layer AIS from NOAA
+- Add a search tool link to Ship Spotter @ shipspotting.com
+- Add a ship type symbology
+- Add ship type info pop-up (slow fade - nothing sudden)
 
  
  Phase 2 — Learning Library (Optional Add-Ons Later)
