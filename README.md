@@ -11,7 +11,10 @@ May this map be a place where exploration feels natural, information is real, an
 
 
 **Project Purpose**
-**NOLE** is an interactive learning map designed for kids who love boats, water, wildlife, and understanding how things work. It helps young explorers learn about Tampa Bay using **real marine data**, **authentic navigation charts**, and **hands-on discovery**—at their own natural learning rhythm.NOLE is a **kid-friendly, research-grade learning tool** that blends:
+
+**NOLE** is an interactive learning map designed for kids who love boats, water, wildlife, and understanding how things work. It helps young explorers learn about Tampa Bay using **real marine data**, **authentic navigation charts**, and **hands-on discovery**—at their own natural learning rhythm.
+
+NOLE is a **kid-friendly, research-grade learning tool** that blends:
 
 - Real **marine and coastal data**
 - Interactive **map layers**
