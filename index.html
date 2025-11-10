@@ -1,31 +1,63 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <title>NOLE — Nautical Open Learning Explorer</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    body {
-      margin: 0; 
-      font-family: system-ui, sans-serif;
-      display: grid;
-      height: 100vh;
-      place-items: center;
-      background: #eef5ff;
-    }
-    .wrap {
-      text-align: center;
-      max-width: 32rem;
-    }
-    h1 { margin-bottom: .5rem; font-size: 1.75rem; }
-    p { font-size: 1.1rem; margin-top: .5rem; }
-  </style>
-</head>
-<body>
-  <div class="wrap">
-    <h1>NOLE — Nautical Open Learning Explorer</h1>
-    <p>Tampa Bay map coming soon!</p>
-    <p>Kids who love boats, wildlife, and water will learn at their own rhythm here.</p>
-  </div>
-</body>
-</html>
+  <!-- (HTML): Minimal Leaflet map with Tampa Bay bounds -->
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <!-- (CSS): Load Leaflet CSS map rendering -->
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>NOLE — Tampa Bay Map</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""
+    />
+    <style>
+      /* (CSS): Full-viewport map container */
+      html, body, #map { height: 100%; margin: 0; }
+    </style>
+  </head>
+  <body>
+    <div id="map" aria-label="Tampa Bay Map"></div>
+
+    <!-- (JavaScript): Load Leaflet JS and configure map + bounds -->
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+      crossorigin=""
+    ></script>
+    <script>
+      // Center St. Pete
+      const centerStPete = [27.770, -82.640];
+
+      // Bounding box: 
+      // North ~ Hudson:   28.36°N,  -82.69°W
+      // South ~ Venice:   27.10°N,  -82.45°W
+      // West buffer (Gulf):          -83.05°W
+      // East buffer (Tampa):  -82.10°W
+      const tampaBounds = L.latLngBounds(
+         [27.05, -83.05],   
+         [28.40, -82.10]    
+      );
+
+      // Create map, lock bounds, set zoom limits
+      const map = L.map('map', {
+        minZoom: 9,
+        maxZoom: 18,
+        maxBounds: tampaBounds,
+        maxBoundsViscosity: 0.9 
+        // elastic edge when kids outside
+      }).setView(centerStPete, 11);
+
+      // Base layer (OpenStreetMap)
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '© OpenStreetMap contributors'
+      }).addTo(map);
+
+      //simple scale bar
+      L.control.scale({ metric: true, imperial: true }).addTo(map);
+    </script>
+  </body>
+  </html>
+
