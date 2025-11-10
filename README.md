@@ -1,11 +1,6 @@
-# NOLE
-NOLE - Nautical Open Learning Explorer. A hands-on discovery map for kids who love boats, wildlife, and Tampa Bay. Find boats, islands, and wildlife with real data and marine charts. Learn the bay your way - look deeply, explore freely, one discovery at a time.
-
-
-
 # NOLE — Nautical Open Learning Explorer
+A hands-on discovery map for kids who love boats, wildlife, and Tampa Bay. Find boats, islands, and wildlife with real data and marine charts. Learn the bay your way - look deeply, explore freely, one discovery at a time.
 
-**NOLE** is an interactive learning map designed for kids who love boats, water, wildlife, and understanding how things work. It helps young explorers learn about Tampa Bay using **real marine data**, **authentic navigation charts**, and **hands-on discovery**—at their own natural learning rhythm.
 
 Dedication
 
@@ -15,9 +10,8 @@ His curiosity is the heart of NOLE.
 May this map be a place where exploration feels natural, information is real, and learning happens just by looking closely.
 
 
-Project Purpose
-
-NOLE is a **kid-friendly, research-grade learning tool** that blends:
+**Project Purpose**
+**NOLE** is an interactive learning map designed for kids who love boats, water, wildlife, and understanding how things work. It helps young explorers learn about Tampa Bay using **real marine data**, **authentic navigation charts**, and **hands-on discovery**—at their own natural learning rhythm.NOLE is a **kid-friendly, research-grade learning tool** that blends:
 
 - Real **marine and coastal data**
 - Interactive **map layers**
@@ -78,11 +72,11 @@ Future Direction (if needed)
 
 ---
 
-## 🤝 Open Project
+Open Project
 NOLE is **open-source** and built for shared learning.  
 As development continues, a license and contributor guidelines will be added.
 
 ---
 
-## ❤️ Thank You
+Thank You
 To everyone who supports kids who learn deeply, differently, and with their whole hearts.
