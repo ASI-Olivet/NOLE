@@ -1,0 +1,8 @@
+{
+"type": "FeatureCollection",
+"name": "Overview_Light_point_3857_clipTB",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:EPSG::3857" } },
+"features": [
+{ "type": "Feature", "properties": { "OBJL": 75, "CATLIT": null, "COLOUR": "1", "EXCLIT": 4, "HEIGHT": 25.9, "LITCHR": 2, "LITVIS": null, "MARSYS": 0, "MLTYLT": 0, "OBJNAM": null, "ORIENT": 0.0, "SECTR1": 0.0, "SECTR2": 0.0, "SIGGRP": "(1)", "SIGPER": 15.0, "SIGSEQ": null, "VERACC": 0.0, "VALNMR": 13.0, "VERDAT": 0, "INFORM": null, "SCAMIN": 9999999, "SORDAT": "20171107", "SORIND": "US,US,reprt,7thCGD,LNM 45/17", "DSNM": "US1GC09M.000" }, "geometry": { "type": "Point", "coordinates": [ -9212876.532666139304638, 3198735.640626251231879 ] } }
+]
+}
