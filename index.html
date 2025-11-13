@@ -59,7 +59,7 @@
       L.control.scale({ metric: true, imperial: true }).addTo(map);
       // Load ENC Harbour coastline layer (GeoJSON)
       // --- Load one ENC Fairway area layer (test) ---
-      fetch("data/Harbour_Fairway_area_3857_clipTB.geojson")
+      fetch("data/Coastal_Fairway_area_4326.geojson")
         .then((response) => response.json())
         .then((data) => {
           const encTestLayer = L.geoJSON(data, {
