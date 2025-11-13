@@ -57,6 +57,25 @@
 
       //simple scale bar
       L.control.scale({ metric: true, imperial: true }).addTo(map);
+      // Load ENC Harbour coastline layer (GeoJSON)
+      fetch("data/Harbour_Coastline_line_3857_clipTB.geojson")
+        .then((response) => response.json())
+        .then((data) => {
+          const harbourCoastlineLayer = L.geoJSON(data, {
+            style: function () {
+              return {
+                weight: 1,
+                color: "#ff0000", // simple red outline so we can see it clearly
+              };
+            },
+          }).addTo(map);
+
+          // Zoom map to the extent of this layer
+          map.fitBounds(harbourCoastlineLayer.getBounds());
+        })
+        .catch((error) => {
+          console.error("Error loading ENC Harbour coastline GeoJSON:", error);
+        });
     </script>
   </body>
   </html>
