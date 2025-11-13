@@ -1,8 +1,0 @@
-{
-"type": "FeatureCollection",
-"name": "Coastal_Buoy_Special_Purpose_General_point_3857_clipTB",
-"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:EPSG::3857" } },
-"features": [
-{ "type": "Feature", "properties": { "OBJL": 19, "BOYSHP": "can", "CATSPM": "27", "COLOUR": "1,11", "COLPAT": "1", "CONRAD": 0, "MARSYS": 0, "NATCON": null, "OBJNAM": null, "VERACC": 0.0, "VERLEN": 0.0, "INFORM": null, "PICREP": null, "SCAMIN": 999999, "SORDAT": "200607", "SORIND": "US,US,graph,Chart 11411", "DSNM": "US3GC06M.000" }, "geometry": { "type": "Point", "coordinates": [ -9222833.003582375124097, 3239281.611576850060374 ] } }
-]
-}

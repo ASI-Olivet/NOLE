@@ -1,8 +1,0 @@
-{
-"type": "FeatureCollection",
-"name": "Harbour_Exclusive_Economic_Zone_area_3857_clipTB",
-"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:EPSG::3857" } },
-"features": [
-
-]
-}

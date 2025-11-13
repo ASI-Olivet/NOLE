@@ -1,8 +1,0 @@
-{
-"type": "FeatureCollection",
-"name": "Coastal_Buoy_Lateral_point_3857_clipTB",
-"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:EPSG::3857" } },
-"features": [
-{ "type": "Feature", "properties": { "OBJL": 17, "BOYSHP": "pillar", "CATLAM": 1, "COLOUR": "4", "COLPAT": null, "CONRAD": 0, "MARSYS": 0, "NATCON": null, "OBJNAM": "Southwest Channel Entrance Lighted Bell Buoy 1", "VERACC": 0.0, "VERLEN": 0.0, "INFORM": null, "PICREP": null, "SCAMIN": 999999, "SORDAT": "20060418", "SORIND": "US,US,reprt,7thCGD,LNM 16/06", "DSNM": "US3GC07M.000" }, "geometry": { "type": "Point", "coordinates": [ -9218365.273743025958538, 3190954.06664490327239 ] } }
-]
-}

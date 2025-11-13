@@ -1,8 +1,0 @@
-{
-"type": "FeatureCollection",
-"name": "Coastal_Radar_Transponder_Beacon_point_3857_clipTB",
-"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:EPSG::3857" } },
-"features": [
-{ "type": "Feature", "properties": { "OBJL": 103, "CATRTB": "racon, radar transponder beacon", "OBJNAM": null, "RADWAL": "0.03-x", "SECTR1": 0.0, "SECTR2": 0.0, "SIGGRP": "(M)", "SIGSEQ": null, "VALMXR": 0.0, "INFORM": null, "SCAMIN": 999999, "SORDAT": "20170131", "SORIND": "US,US,reprt,7thCGD,LNM 05/17", "DSNM": "US3GC07M.000" }, "geometry": { "type": "Point", "coordinates": [ -9206432.536774732172489, 3177925.342045177705586 ] } }
-]
-}

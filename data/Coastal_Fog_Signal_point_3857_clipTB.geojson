@@ -1,8 +1,0 @@
-{
-"type": "FeatureCollection",
-"name": "Coastal_Fog_Signal_point_3857_clipTB",
-"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:EPSG::3857" } },
-"features": [
-{ "type": "Feature", "properties": { "OBJL": 58, "CATFOG": "bell", "OBJNAM": null, "SIGFRQ": 0, "SIGGEN": 0, "SIGGRP": null, "SIGPER": 0.0, "SIGSEQ": null, "VALMXR": 0.0, "INFORM": null, "SCAMIN": 999999, "SORDAT": "20060418", "SORIND": "US,US,reprt,7thCGD,LNM 16/06", "DSNM": "US3GC07M.000" }, "geometry": { "type": "Point", "coordinates": [ -9218365.273743025958538, 3190954.06664490327239 ] } }
-]
-}

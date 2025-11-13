@@ -1,8 +1,0 @@
-{
-"type": "FeatureCollection",
-"name": "Overview_Navigational_System_of_Marks_area_3857_clipTB",
-"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:EPSG::3857" } },
-"features": [
-{ "type": "Feature", "properties": { "OBJL": 306, "MARSYS": 2, "ORIENT": 0.0, "INFORM": null, "SCAMIN": 0, "SORDAT": "200303", "SORIND": "US,US,graph,Chart 411", "DSNM": "US1GC09M.000", "SHAPE_AREA": 346.40208791100002, "SHAPE_LEN": 75.66734 }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -9048840.800499992445111, 3138875.462299995590001 ], [ -9289158.817400000989437, 3138875.462299995590001 ], [ -9289158.817400000989437, 3333331.262299995403737 ], [ -9048840.800499992445111, 3333331.262299995403737 ], [ -9048840.800499992445111, 3138875.462299995590001 ] ] ] } }
-]
-}
