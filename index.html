@@ -62,22 +62,23 @@
       fetch("data/Coastal_Fairway_area_4326.geojson")
         .then((response) => response.json())
         .then((data) => {
+          console.log("ENC Fairway loaded, feature count:", data.features ? data.features.length : "no features field");
+
           const encTestLayer = L.geoJSON(data, {
             style: {
-              color: "#00ff00",      // bright green outline
+              color: "#00ff00",
               weight: 2,
-              fillColor: "#00ff00",  // bright green fill
-              fillOpacity: 0.4       // see OSM underneath, but clearly visible
+              fillColor: "#00ff00",
+              fillOpacity: 0.4
             }
           }).addTo(map);
 
-          encTestLayer.bringToFront();
-          map.fitBounds(encTestLayer.getBounds());
-        })
-        .catch((err) => {
-          console.error("Error loading ENC Fairway GeoJSON:", err);
-        });
+          const bounds = encTestLayer.getBounds();
+          console.log("ENC Fairway layer bounds:", bounds);
 
+          encTestLayer.bringToFront();
+          map.fitBounds(bounds);
+        })
     </script>
   </body>
   </html>
