@@ -58,24 +58,26 @@
       //simple scale bar
       L.control.scale({ metric: true, imperial: true }).addTo(map);
       // Load ENC Harbour coastline layer (GeoJSON)
-      fetch("data/Harbour_Coastline_line_3857_clipTB.geojson")
+      // --- Load one ENC Fairway area layer (test) ---
+      fetch("data/Harbour_Fairway_area_3857_clipTB.geojson")
         .then((response) => response.json())
         .then((data) => {
-          const harbourCoastlineLayer = L.geoJSON(data, {
-            style: function () {
-              return {
-                weight: 1,
-                color: "#ff0000", // simple red outline so we can see it clearly
-              };
-            },
+          const encTestLayer = L.geoJSON(data, {
+            style: {
+              color: "#00ff00",      // bright green outline
+              weight: 2,
+              fillColor: "#00ff00",  // bright green fill
+              fillOpacity: 0.4       // see OSM underneath, but clearly visible
+            }
           }).addTo(map);
 
-          // Zoom map to the extent of this layer
-          map.fitBounds(harbourCoastlineLayer.getBounds());
+          encTestLayer.bringToFront();
+          map.fitBounds(encTestLayer.getBounds());
         })
-        .catch((error) => {
-          console.error("Error loading ENC Harbour coastline GeoJSON:", error);
+        .catch((err) => {
+          console.error("Error loading ENC Fairway GeoJSON:", err);
         });
+
     </script>
   </body>
   </html>
