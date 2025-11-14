@@ -1,0 +1,11 @@
+{
+"type": "FeatureCollection",
+"name": "Harbour_Cable_Submarine_line",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "OBJL": 22, "BURDEP": 0.0, "CATCBL": null, "CONDTN": 0, "OBJNAM": null, "VERDAT": 0, "INFORM": null, "SCAMIN": 59999, "SORDAT": "20120918", "SORIND": "US,US,reprt,7thCGD,LNM 38/12", "DSNM": "US5TPACD.000", "SHAPE_LEN": 0.0042801175590999998 }, "geometry": { "type": "LineString", "coordinates": [ [ -82.860361800000021, 27.6 ], [ -82.8593194, 27.597307100000023 ], [ -82.8590633, 27.5966454 ], [ -82.859014600000023, 27.596519699999988 ], [ -82.858816699999977, 27.596008499999982 ] ] } },
+{ "type": "Feature", "properties": { "OBJL": 22, "BURDEP": 0.0, "CATCBL": null, "CONDTN": 0, "OBJNAM": null, "VERDAT": 0, "INFORM": null, "SCAMIN": 59999, "SORDAT": "20120918", "SORIND": "US,US,reprt,7thCGD,LNM 38/12", "DSNM": "US5TPADD.000", "SHAPE_LEN": 0.0026450789969299998 }, "geometry": { "type": "LineString", "coordinates": [ [ -82.861316699999975, 27.602466699999979 ], [ -82.860361800000021, 27.6 ] ] } },
+{ "type": "Feature", "properties": { "OBJL": 22, "BURDEP": 0.0, "CATCBL": null, "CONDTN": 0, "OBJNAM": null, "VERDAT": 0, "INFORM": null, "SCAMIN": 44999, "SORDAT": "20120918", "SORIND": "US,US,reprt,7thCGD,LNM 38/12", "DSNM": "US5TPADF.000", "SHAPE_LEN": 0.00162864976091 }, "geometry": { "type": "LineString", "coordinates": [ [ -82.655633299999977, 27.622216700000024 ], [ -82.655529600000023, 27.621895 ], [ -82.6553278, 27.621269499999983 ], [ -82.655219100000011, 27.620932499999981 ], [ -82.655133299999989, 27.620666700000015 ] ] } },
+{ "type": "Feature", "properties": { "OBJL": 22, "BURDEP": 0.0, "CATCBL": null, "CONDTN": 0, "OBJNAM": null, "VERDAT": 0, "INFORM": null, "SCAMIN": 21999, "SORDAT": "20120918", "SORIND": "US,US,reprt,7thCGD,LNM 38/12", "DSNM": "US5TPADG.000", "SHAPE_LEN": 0.0056643665080400004 }, "geometry": { "type": "LineString", "coordinates": [ [ -82.6001, 27.6610667 ], [ -82.599482599999988, 27.661147200000016 ], [ -82.596485799999982, 27.661538599999972 ], [ -82.596212900000012, 27.661574200000018 ], [ -82.594483299999979, 27.6618 ] ] } }
+]
+}

@@ -1,0 +1,9 @@
+{
+"type": "FeatureCollection",
+"name": "Coastal_Buoy_Safe_Water_point",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "OBJL": 18, "BOYSHP": "pillar", "COLOUR": "3,1", "COLPAT": "2", "CONRAD": 0, "MARSYS": 0, "NATCON": null, "OBJNAM": "Longboat Pass Channel Approach Lighted Buoy LP", "VERACC": 0.0, "VERLEN": 0.0, "INFORM": null, "PICREP": null, "SCAMIN": 999999, "SORDAT": "20170131", "SORIND": "US,US,reprt,7thCGD,LNM 05/17", "DSNM": "US3GC07M.000" }, "geometry": { "type": "Point", "coordinates": [ -82.702790600000014, 27.435001399999976 ] } },
+{ "type": "Feature", "properties": { "OBJL": 18, "BOYSHP": "pillar", "COLOUR": "3,1", "COLPAT": "2", "CONRAD": 0, "MARSYS": 0, "NATCON": null, "OBJNAM": "Tampa Bay Lighted Buoy T", "VERACC": 0.0, "VERLEN": 0.0, "INFORM": "Automatic Identification System (AIS): MMSI 993672025.", "PICREP": null, "SCAMIN": 999999, "SORDAT": "20150224", "SORIND": "US,US,reprt,7thCGD,LNM 08/15", "DSNM": "US3GC07M.000" }, "geometry": { "type": "Point", "coordinates": [ -83.011818600000026, 27.58853640000001 ] } }
+]
+}

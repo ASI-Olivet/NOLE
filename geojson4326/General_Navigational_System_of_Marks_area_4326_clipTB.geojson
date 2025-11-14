@@ -1,0 +1,8 @@
+{
+"type": "FeatureCollection",
+"name": "General_Navigational_System_of_Marks_area",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "OBJL": 306, "MARSYS": 2, "ORIENT": 0.0, "INFORM": null, "SCAMIN": 0, "SORDAT": "20130801", "SORIND": "US,US,graph,Chart 11006", "DSNM": "US2GC09M.000", "SHAPE_AREA": 55.503610463900003, "SHAPE_LEN": 31.1999998 }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -83.05, 28.4 ], [ -82.1, 28.4 ], [ -82.1, 27.145223048012738 ], [ -83.05, 27.145223048012738 ], [ -83.05, 28.4 ] ] ] } }
+]
+}
