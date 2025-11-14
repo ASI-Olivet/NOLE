@@ -27,58 +27,56 @@
       crossorigin=""
     ></script>
     <script>
-      // Center St. Pete
-      const centerStPete = [27.770, -82.640];
+      // Basic center for Tampa Bay
+      const centerStPete = [27.77, -82.64];
 
-      // Bounding box: 
-      // North ~ Hudson:   28.36°N,  -82.69°W
-      // South ~ Venice:   27.10°N,  -82.45°W
-      // West buffer (Gulf):          -83.05°W
-      // East buffer (Tampa):  -82.10°W
-      const tampaBounds = L.latLngBounds(
-         [27.05, -83.05],   
-         [28.40, -82.10]    
-      );
-
-      // Create map, lock bounds, set zoom limits
-      const map = L.map('map', {
-        minZoom: 9,
-        maxZoom: 18,
-        maxBounds: tampaBounds,
-        maxBoundsViscosity: 0.9 
-        // elastic edge when kids outside
-      }).setView(centerStPete, 11);
+      // Create the map
+      const map = L.map("map").setView(centerStPete, 10);
 
       // Base layer (OpenStreetMap)
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         maxZoom: 19,
-        attribution: '© OpenStreetMap contributors'
+        attribution: "© OpenStreetMap contributors",
       }).addTo(map);
 
-      //simple scale bar
+      // Simple scale bar
       L.control.scale({ metric: true, imperial: true }).addTo(map);
-      // Load ENC Harbour coastline layer (GeoJSON)
-      // --- Load one ENC Fairway area layer (test) ---
-      // --- Load ENC layer (WGS84 GeoJSON) ---
+
+      // --- Load ENC Coastal Bridge layer (WGS84 GeoJSON) ---
       fetch("Coastal_Bridge_area_4326_clipTB.geojson")
-        .then(response => response.json())
-        .then(data => {
-          console.log("Loaded ENC feature count:", data.features.length);
+        .then((response) => {
+          console.log("GeoJSON fetch status:", response.status);
+          return response.json();
+        })
+        .then((data) => {
+          console.log(
+            "Loaded ENC feature count:",
+            data.features ? data.features.length : "no features array"
+          );
 
           const encLayer = L.geoJSON(data, {
             style: {
-              color: "#ff00ff",
+              color: "#ff00ff",      // magenta outline
               weight: 2,
-              fillColor: "#ff00ff",
-              fillOpacity: 0.3
-            }
+              fillColor: "#ff00ff",  // magenta fill
+              fillOpacity: 0.3,
+            },
           }).addTo(map);
 
+          const bounds = encLayer.getBounds();
+          console.log("ENC layer bounds:", bounds);
+          if (bounds.isValid()) {
+            map.fitBounds(bounds);
+          } else {
+            console.warn("ENC layer bounds are not valid.");
+          }
+
           encLayer.bringToFront();
-          map.fitBounds(encLayer.getBounds());
         })
-        .catch(err => console.error("Error loading ENC GeoJSON:", err));
-    </script>
+        .catch((err) => {
+          console.error("Error loading ENC GeoJSON:", err);
+        });
+    </script> 
   </body>
   </html>
 
