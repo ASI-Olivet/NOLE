@@ -1,0 +1,8 @@
+{
+"type": "FeatureCollection",
+"name": "General_Wreck_point",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "OBJL": 159, "CATWRK": "dangerous wreck", "CONRAD": 0, "CONVIS": 0, "EXPSOU": 1, "HEIGHT": 0.0, "OBJNAM": null, "QUASOU": "6", "SOUACC": 0.0, "TECSOU": null, "VALSOU": 15.5, "VERACC": 0.0, "VERDAT": 0, "VERLEN": 0.0, "WATLEV": 3, "INFORM": null, "SCAMIN": 0, "SORDAT": "20190724", "SORIND": "US,US,graph,H-13178", "DSNM": "US2GC09M.000" }, "geometry": { "type": "Point", "coordinates": [ -82.9855738, 27.506536700000026 ] } }
+]
+}

@@ -1,0 +1,9 @@
+{
+"type": "FeatureCollection",
+"name": "Harbour_Fog_Signal_point",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "OBJL": 58, "CATFOG": "bell", "OBJNAM": null, "SIGFRQ": 0, "SIGGEN": 0, "SIGGRP": null, "SIGPER": 0.0, "SIGSEQ": null, "VALMXR": 0.0, "INFORM": null, "SCAMIN": 44999, "SORDAT": "20150224", "SORIND": "US,US,reprt,7thCGD,LNM 08/15", "DSNM": "US5TPADF.000" }, "geometry": { "type": "Point", "coordinates": [ -82.666960300000028, 27.615878099999975 ] } },
+{ "type": "Feature", "properties": { "OBJL": 58, "CATFOG": "bell", "OBJNAM": null, "SIGFRQ": 0, "SIGGEN": 0, "SIGGRP": null, "SIGPER": 0.0, "SIGSEQ": null, "VALMXR": 0.0, "INFORM": null, "SCAMIN": 59999, "SORDAT": "20060418", "SORIND": "US,US,reprt,7thCGD,LNM 16/06", "DSNM": "US5TPACD.000" }, "geometry": { "type": "Point", "coordinates": [ -82.809984199999974, 27.538828599999988 ] } }
+]
+}
