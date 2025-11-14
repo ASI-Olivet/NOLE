@@ -58,10 +58,11 @@
     }).addTo(map);
 
     /* =========================================================
-       3. Load a controlled batch of ENC GeoJSON layers (round 1)
-          Only the top 1/3 of your list (8 layers)
+       3. Load a controlled batch of ENC GeoJSON layers (round 2)
+          First 2/3 of your list (16 layers)
     ========================================================= */
     const encLayers = [
+      // ---- Coastal ----
       {
         name: "Coastal Bridges",
         file: "Coastal_Bridge_area_4326_clipTB.geojson",
@@ -114,6 +115,8 @@
           weight: 2,
         },
       },
+
+      // ---- General ----
       {
         name: "General Buoy Special Purpose",
         file: "General_Buoy_Special_Purpose_General_point_4326_clipTB.geojson",
@@ -130,6 +133,78 @@
           weight: 2,
           fillColor: "#ff6600",
           fillOpacity: 0.25,
+        },
+      },
+
+      // ---- Harbour ----
+      {
+        name: "Harbour Buoy Special Purpose",
+        file: "Harbour_Buoy_Special_Purpose_General_point_4326_clipTB.geojson",
+        style: {
+          color: "#00ffff",
+          weight: 2,
+        },
+      },
+      {
+        name: "Harbour Submarine Cables",
+        file: "Harbour_Cable_Submarine_line_4326_clipTB.geojson",
+        style: {
+          color: "#00ffff",
+          weight: 2,
+        },
+      },
+      {
+        name: "Harbour Coastguard Stations",
+        file: "Harbour_Coastguard_Station_point_4326_clipTB.geojson",
+        style: {
+          color: "#ffffff",
+          weight: 2,
+        },
+      },
+      {
+        name: "Harbour Coastline",
+        file: "Harbour_Coastline_line_4326_clipTB.geojson",
+        style: {
+          color: "#ffffff",
+          weight: 1,
+        },
+      },
+      {
+        name: "Harbour Fairways",
+        file: "Harbour_Fairway_area_4326_clipTB.geojson",
+        style: {
+          color: "#0000ff",
+          weight: 2,
+          fillColor: "#0000ff",
+          fillOpacity: 0.25,
+        },
+      },
+      {
+        name: "Harbour Fog Signals",
+        file: "Harbour_Fog_Signal_point_4326_clipTB.geojson",
+        style: {
+          color: "#ffff00",
+          weight: 2,
+        },
+      },
+      {
+        name: "Harbour Marine Farms",
+        file: "Harbour_Marine_Farm_Culture_area_4326_clipTB.geojson",
+        style: {
+          color: "#00ff88",
+          weight: 2,
+          fillColor: "#00ff88",
+          fillOpacity: 0.3,
+        },
+      },
+      {
+        name: "Harbour Military Practice Areas",
+        file: "Harbour_Military_Practice_Area_4326_clipTB.geojson",
+        style: {
+          color: "#ff0000",
+          weight: 2,
+          fillColor: "#ff0000",
+          fillOpacity: 0.2,
         },
       },
     ];
