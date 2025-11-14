@@ -42,18 +42,35 @@
   ></script>
 
   <script>
-    //Confirm Leaflet loads properly
+    /* =========================================================
+       1. Define Tampa Bay bounding box
+    ========================================================= */
+    const tampaBounds = L.latLngBounds(
+      [27.00, -83.05], // SW: south, west
+      [28.40, -82.10]  // NE: north, east
+    );
+
+    /* =========================================================
+       2. Build map and base tile layer, locked to Tampa bounds
+    ========================================================= */
     console.log("Leaflet version:", L.version);
 
-    //Build map and base tile layer
-    const map = L.map("map").setView([27.77, -82.64], 10);
+    const map = L.map("map", {
+      center: [27.77, -82.64],
+      zoom: 10,
+      minZoom: 9,
+      maxBounds: tampaBounds,
+      maxBoundsViscosity: 0.9, // "rubber band" near edge
+    });
 
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       maxZoom: 19,
       attribution: "© OpenStreetMap contributors",
     }).addTo(map);
-    
-    //Load ENC GeoJSON layers (full list: 24 layers)
+
+    /* =========================================================
+       3. Load ENC GeoJSON layers (full list: 24 layers)
+    ========================================================= */
     const encLayers = [
       // ---- Coastal ----
       {
@@ -276,8 +293,6 @@
       },
     ];
 
-    let allBounds = null;
-
     encLayers.forEach((cfg) => {
       fetch(cfg.file)
         .then((response) => {
@@ -302,15 +317,6 @@
 
           const bounds = layer.getBounds();
           console.log(`${cfg.name} bounds:`, bounds);
-
-          if (bounds && bounds.isValid && bounds.isValid()) {
-            if (allBounds) {
-              allBounds.extend(bounds);
-            } else {
-              allBounds = bounds;
-            }
-            map.fitBounds(allBounds);
-          }
         })
         .catch((err) => {
           console.error(`Error loading ${cfg.name}:`, err);
