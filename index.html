@@ -58,8 +58,7 @@
     }).addTo(map);
 
     /* =========================================================
-       3. Load a controlled batch of ENC GeoJSON layers (round 2)
-          First 2/3 of your list (16 layers)
+       3. Load ENC GeoJSON layers (full list: 24 layers)
     ========================================================= */
     const encLayers = [
       // ---- Coastal ----
@@ -136,7 +135,7 @@
         },
       },
 
-      // ---- Harbour ----
+      // ---- Harbour (first batch) ----
       {
         name: "Harbour Buoy Special Purpose",
         file: "Harbour_Buoy_Special_Purpose_General_point_4326_clipTB.geojson",
@@ -205,6 +204,80 @@
           weight: 2,
           fillColor: "#ff0000",
           fillOpacity: 0.2,
+        },
+      },
+
+      // ---- Harbour (second batch) ----
+      {
+        name: "Harbour Navigation Lines",
+        file: "Harbour_Navigation_Line_4326_clipTB.geojson",
+        style: {
+          color: "#00ffff",
+          weight: 2,
+        },
+      },
+      {
+        name: "Harbour Obstructions",
+        file: "Harbour_Obstruction_area_4326_clipTB.geojson",
+        style: {
+          color: "#ff3300",
+          weight: 2,
+          fillColor: "#ff3300",
+          fillOpacity: 0.3,
+        },
+      },
+      {
+        name: "Harbour Offshore Platforms",
+        file: "Harbour_Offshore_Platform_point_4326_clipTB.geojson",
+        style: {
+          color: "#ff0000",
+          weight: 2,
+        },
+      },
+      {
+        name: "Harbour Radar Transponder Beacons",
+        file: "Harbour_Radar_Transponder_Beacon_point_4326_clipTB.geojson",
+        style: {
+          color: "#ffff00",
+          weight: 2,
+        },
+      },
+      {
+        name: "Harbour Wrecks",
+        file: "Harbour_Wreck_point_4326_clipTB.geojson",
+        style: {
+          color: "#ff0000",
+          weight: 2,
+        },
+      },
+
+      // ---- Overview ----
+      {
+        name: "Overview Caution Area",
+        file: "Overview_Caution_Area_4326_clipTB.geojson",
+        style: {
+          color: "#ff8800",
+          weight: 2,
+          fillColor: "#ff8800",
+          fillOpacity: 0.2,
+        },
+      },
+      {
+        name: "Overview EEZ",
+        file: "Overview_Exclusive_Economic_Zone_area_4326_clipTB.geojson",
+        style: {
+          color: "#00ff00",
+          weight: 1,
+          fillColor: "#00ff00",
+          fillOpacity: 0.08,
+        },
+      },
+      {
+        name: "Overview Wrecks",
+        file: "Overview_Wreck_point_4326_clipTB.geojson",
+        style: {
+          color: "#ff0000",
+          weight: 2,
         },
       },
     ];
