@@ -32,549 +32,71 @@
 
       // Create the map
       // --- Load multiple ENC layers (all *_4326_clipTB.geojson) ---
-      const encLayers = [
-        // ---- Coastal scale ----
-        {
-          name: "Coastal Bridges",
-          file: "Coastal_Bridge_area_4326_clipTB.geojson",
-          style: {
-            color: "#ff00ff",
-            weight: 2,
-            fillColor: "#ff00ff",
-            fillOpacity: 0.3,
-          },
-        },
-        {
-          name: "Coastal Buoy Lateral",
-          file: "Coastal_Buoy_Lateral_point_4326_clipTB.geojson",
-          style: {
-            color: "#00ffff",
-            weight: 2,
-          },
-        },
-        {
-          name: "Coastal Buoy Safe Water",
-          file: "Coastal_Buoy_Safe_Water_point_4326_clipTB.geojson",
-          style: {
-            color: "#00ffff",
-            weight: 2,
-          },
-        },
-        {
-          name: "Coastal Buoy Special Purpose",
-          file: "Coastal_Buoy_Special_Purpose_General_point_4326_clipTB.geojson",
-          style: {
-            color: "#00ffff",
-            weight: 2,
-          },
-        },
-        {
-          name: "Coastal Caution Area",
-          file: "Coastal_Caution_Area_4326_clipTB.geojson",
-          style: {
-            color: "#ff8800",
-            weight: 2,
-            fillColor: "#ff8800",
-            fillOpacity: 0.2,
-          },
-        },
-        {
-          name: "Coastal Caution Area Points",
-          file: "Coastal_Caution_Area_point_4326_clipTB.geojson",
-          style: {
-            color: "#ff8800",
-            weight: 2,
-          },
-        },
-        {
-          name: "Coastal Coastline",
-          file: "Coastal_Coastline_line_4326_clipTB.geojson",
-          style: {
-            color: "#ffffff",
-            weight: 1,
-          },
-        },
-        {
-          name: "Coastal EEZ",
-          file: "Coastal_Exclusive_Economic_Zone_area_4326_clipTB.geojson",
-          style: {
-            color: "#00ff00",
-            weight: 1,
-            fillColor: "#00ff00",
-            fillOpacity: 0.1,
-          },
-        },
-        {
-          name: "Coastal Fairway (clipped)",
-          file: "Coastal_Fairway_area_4326_clipTB.geojson",
-          style: {
-            color: "#00ff00",
-            weight: 2,
-            fillColor: "#00ff00",
-            fillOpacity: 0.2,
-          },
-        },
-        {
-          name: "Coastal Fairway (full)",
-          file: "Coastal_Fairway_area_4326.geojson",
-          style: {
-            color: "#00aa00",
-            weight: 1,
-            fillColor: "#00aa00",
-            fillOpacity: 0.1,
-          },
-        },
-        {
-          name: "Coastal Fog Signals",
-          file: "Coastal_Fog_Signal_point_4326_clipTB.geojson",
-          style: {
-            color: "#ffff00",
-            weight: 2,
-          },
-        },
-        {
-          name: "Coastal Lights",
-          file: "Coastal_Light_point_4326_clipTB.geojson",
-          style: {
-            color: "#ffff00",
-            weight: 2,
-          },
-        },
-        {
-          name: "Coastal Nav System of Marks",
-          file: "Coastal_Navigational_System_of_Marks_area_4326_clipTB.geojson",
-          style: {
-            color: "#ff00ff",
-            weight: 1,
-            fillColor: "#ff00ff",
-            fillOpacity: 0.15,
-          },
-        },
-        {
-          name: "Coastal Obstructions",
-          file: "Coastal_Obstruction_area_4326_clipTB.geojson",
-          style: {
-            color: "#ff0000",
-            weight: 2,
-            fillColor: "#ff0000",
-            fillOpacity: 0.3,
-          },
-        },
-        {
-          name: "Coastal Offshore Platforms",
-          file: "Coastal_Offshore_Platform_point_4326_clipTB.geojson",
-          style: {
-            color: "#ff0000",
-            weight: 2,
-          },
-        },
-        {
-          name: "Coastal Radar Transponder Beacons",
-          file: "Coastal_Radar_Transponder_Beacon_point_4326_clipTB.geojson",
-          style: {
-            color: "#00ffff",
-            weight: 2,
-          },
-        },
-        {
-          name: "Coastal Wrecks",
-          file: "Coastal_Wreck_point_4326_clipTB.geojson",
-          style: {
-            color: "#ff0000",
-            weight: 2,
-          },
-        },
+// --- Minimal batch loader: 2 known good files ---
+const encLayers = [
+  {
+    name: "Coastal Bridges",
+    file: "Coastal_Bridge_area_4326_clipTB.geojson",
+    style: {
+      color: "#ff00ff",
+      weight: 2,
+      fillColor: "#ff00ff",
+      fillOpacity: 0.3,
+    },
+  },
+  {
+    name: "Coastal Caution Area",
+    file: "Coastal_Caution_Area_4326_clipTB.geojson",
+    style: {
+      color: "#ff8800",
+      weight: 2,
+      fillColor: "#ff8800",
+      fillOpacity: 0.2,
+    },
+  },
+];
 
-        // ---- General scale ----
-        {
-          name: "General Buoy Special Purpose",
-          file: "General_Buoy_Special_Purpose_General_point_4326_clipTB.geojson",
-          style: {
-            color: "#00ffff",
-            weight: 2,
-          },
-        },
-        {
-          name: "General Caution Area",
-          file: "General_Caution_Area_4326_clipTB.geojson",
-          style: {
-            color: "#ff8800",
-            weight: 2,
-            fillColor: "#ff8800",
-            fillOpacity: 0.15,
-          },
-        },
-        {
-          name: "General Coastline",
-          file: "General_Coastline_line_4326_clipTB.geojson",
-          style: {
-            color: "#ffffff",
-            weight: 1,
-          },
-        },
-        {
-          name: "General EEZ",
-          file: "General_Exclusive_Economic_Zone_area_4326_clipTB.geojson",
-          style: {
-            color: "#00ff00",
-            weight: 1,
-            fillColor: "#00ff00",
-            fillOpacity: 0.05,
-          },
-        },
-        {
-          name: "General Lights",
-          file: "General_Light_point_4326_clipTB.geojson",
-          style: {
-            color: "#ffff00",
-            weight: 2,
-          },
-        },
-        {
-          name: "General Nav System of Marks",
-          file: "General_Navigational_System_of_Marks_area_4326_clipTB.geojson",
-          style: {
-            color: "#ff00ff",
-            weight: 1,
-            fillColor: "#ff00ff",
-            fillOpacity: 0.1,
-          },
-        },
-        {
-          name: "General Obstructions",
-          file: "General_Obstruction_area_4326_clipTB.geojson",
-          style: {
-            color: "#ff0000",
-            weight: 2,
-            fillColor: "#ff0000",
-            fillOpacity: 0.25,
-          },
-        },
-        {
-          name: "General Wrecks",
-          file: "General_Wreck_point_4326_clipTB.geojson",
-          style: {
-            color: "#ff0000",
-            weight: 2,
-          },
-        },
+let allBounds = null;
 
-        // ---- Harbour scale ----
-        {
-          name: "Harbour Bridges",
-          file: "Harbour_Bridge_area_4326_clipTB.geojson",
-          style: {
-            color: "#ff00ff",
-            weight: 2,
-            fillColor: "#ff00ff",
-            fillOpacity: 0.3,
-          },
-        },
-        {
-          name: "Harbour Buoy Lateral",
-          file: "Harbour_Buoy_Lateral_point_4326_clipTB.geojson",
-          style: {
-            color: "#00ffff",
-            weight: 2,
-          },
-        },
-        {
-          name: "Harbour Buoy Safe Water",
-          file: "Harbour_Buoy_Safe_Water_point_4326_clipTB.geojson",
-          style: {
-            color: "#00ffff",
-            weight: 2,
-          },
-        },
-        {
-          name: "Harbour Buoy Special Purpose",
-          file: "Harbour_Buoy_Special_Purpose_General_point_4326_clipTB.geojson",
-          style: {
-            color: "#00ffff",
-            weight: 2,
-          },
-        },
-        {
-          name: "Harbour Cable Area",
-          file: "Harbour_Cable_Area_4326_clipTB.geojson",
-          style: {
-            color: "#00ffff",
-            weight: 1,
-            fillColor: "#00ffff",
-            fillOpacity: 0.1,
-          },
-        },
-        {
-          name: "Harbour Submarine Cables",
-          file: "Harbour_Cable_Submarine_line_4326_clipTB.geojson",
-          style: {
-            color: "#00ffff",
-            weight: 2,
-          },
-        },
-        {
-          name: "Harbour Caution Area",
-          file: "Harbour_Caution_Area_4326_clipTB.geojson",
-          style: {
-            color: "#ff8800",
-            weight: 2,
-            fillColor: "#ff8800",
-            fillOpacity: 0.2,
-          },
-        },
-        {
-          name: "Harbour Caution Area Points",
-          file: "Harbour_Caution_Area_point_4326_clipTB.geojson",
-          style: {
-            color: "#ff8800",
-            weight: 2,
-          },
-        },
-        {
-          name: "Harbour Coastguard Stations",
-          file: "Harbour_Coastguard_Station_point_4326_clipTB.geojson",
-          style: {
-            color: "#ffffff",
-            weight: 2,
-          },
-        },
-        {
-          name: "Harbour Coastline",
-          file: "Harbour_Coastline_line_4326_clipTB.geojson",
-          style: {
-            color: "#ffffff",
-            weight: 1,
-          },
-        },
-        {
-          name: "Harbour EEZ",
-          file: "Harbour_Exclusive_Economic_Zone_area_4326_clipTB.geojson",
-          style: {
-            color: "#00ff00",
-            weight: 1,
-            fillColor: "#00ff00",
-            fillOpacity: 0.05,
-          },
-        },
-        {
-          name: "Harbour Fairways",
-          file: "Harbour_Fairway_area_4326_clipTB.geojson",
-          style: {
-            color: "#0000ff",
-            weight: 2,
-            fillColor: "#0000ff",
-            fillOpacity: 0.2,
-          },
-        },
-        {
-          name: "Harbour Fog Signals",
-          file: "Harbour_Fog_Signal_point_4326_clipTB.geojson",
-          style: {
-            color: "#ffff00",
-            weight: 2,
-          },
-        },
-        {
-          name: "Harbour Lights",
-          file: "Harbour_Light_point_4326_clipTB.geojson",
-          style: {
-            color: "#ffff00",
-            weight: 2,
-          },
-        },
-        {
-          name: "Harbour Marine Farms",
-          file: "Harbour_Marine_Farm_Culture_area_4326_clipTB.geojson",
-          style: {
-            color: "#00ff00",
-            weight: 2,
-            fillColor: "#00ff00",
-            fillOpacity: 0.3,
-          },
-        },
-        {
-          name: "Harbour Military Practice Areas",
-          file: "Harbour_Military_Practice_Area_4326_clipTB.geojson",
-          style: {
-            color: "#ff0000",
-            weight: 2,
-            fillColor: "#ff0000",
-            fillOpacity: 0.2,
-          },
-        },
-        {
-          name: "Harbour Mooring/Warping Facilities",
-          file: "Harbour_Mooring_Warping_Facility_point_4326_clipTB.geojson",
-          style: {
-            color: "#ffffff",
-            weight: 2,
-          },
-        },
-        {
-          name: "Harbour Navigation Lines",
-          file: "Harbour_Navigation_Line_4326_clipTB.geojson",
-          style: {
-            color: "#00ffff",
-            weight: 2,
-          },
-        },
-        {
-          name: "Harbour Nav System of Marks",
-          file: "Harbour_Navigational_System_of_Marks_area_4326_clipTB.geojson",
-          style: {
-            color: "#ff00ff",
-            weight: 1,
-            fillColor: "#ff00ff",
-            fillOpacity: 0.15,
-          },
-        },
-        {
-          name: "Harbour Obstructions",
-          file: "Harbour_Obstruction_area_4326_clipTB.geojson",
-          style: {
-            color: "#ff0000",
-            weight: 2,
-            fillColor: "#ff0000",
-            fillOpacity: 0.3,
-          },
-        },
-        {
-          name: "Harbour Offshore Platforms",
-          file: "Harbour_Offshore_Platform_point_4326_clipTB.geojson",
-          style: {
-            color: "#ff0000",
-            weight: 2,
-          },
-        },
-        {
-          name: "Harbour Radar Transponder Beacons",
-          file: "Harbour_Radar_Transponder_Beacon_point_4326_clipTB.geojson",
-          style: {
-            color: "#00ffff",
-            weight: 2,
-          },
-        },
-        {
-          name: "Harbour Recommended Tracks",
-          file: "Harbour_Recommended_Track_line_4326_clipTB.geojson",
-          style: {
-            color: "#0000ff",
-            weight: 2,
-          },
-        },
-        {
-          name: "Harbour Wrecks",
-          file: "Harbour_Wreck_point_4326_clipTB.geojson",
-          style: {
-            color: "#ff0000",
-            weight: 2,
-          },
-        },
-
-        // ---- Overview scale ----
-        {
-          name: "Overview Caution Area",
-          file: "Overview_Caution_Area_4326_clipTB.geojson",
-          style: {
-            color: "#ff8800",
-            weight: 2,
-            fillColor: "#ff8800",
-            fillOpacity: 0.15,
-          },
-        },
-        {
-          name: "Overview Caution Area Points",
-          file: "Overview_Caution_Area_point_4326_clipTB.geojson",
-          style: {
-            color: "#ff8800",
-            weight: 2,
-          },
-        },
-        {
-          name: "Overview Coastline",
-          file: "Overview_Coastline_line_4326_clipTB.geojson",
-          style: {
-            color: "#ffffff",
-            weight: 1,
-          },
-        },
-        {
-          name: "Overview EEZ",
-          file: "Overview_Exclusive_Economic_Zone_area_4326_clipTB.geojson",
-          style: {
-            color: "#00ff00",
-            weight: 1,
-            fillColor: "#00ff00",
-            fillOpacity: 0.03,
-          },
-        },
-        {
-          name: "Overview Lights",
-          file: "Overview_Light_point_4326_clipTB.geojson",
-          style: {
-            color: "#ffff00",
-            weight: 2,
-          },
-        },
-        {
-          name: "Overview Nav System of Marks",
-          file: "Overview_Navigational_System_of_Marks_area_4326_clipTB.geojson",
-          style: {
-            color: "#ff00ff",
-            weight: 1,
-            fillColor: "#ff00ff",
-            fillOpacity: 0.1,
-          },
-        },
-        {
-          name: "Overview Wrecks",
-          file: "Overview_Wreck_point_4326_clipTB.geojson",
-          style: {
-            color: "#ff0000",
-            weight: 2,
-          },
-        },
-      ];
-
-      let allBounds = null;
-
-      encLayers.forEach((cfg) => {
-        fetch(cfg.file)
-          .then((response) => {
-            console.log(`Fetching ${cfg.name}:`, cfg.file, "status", response.status);
-            if (!response.ok) {
-              throw new Error(`HTTP ${response.status}`);
-            }
-            return response.json();
-          })
-          .then((data) => {
-            const layer = L.geoJSON(data, {
-              style: cfg.style,
-            }).addTo(map);
-
-            layer.bringToFront();
-
-            const bounds = layer.getBounds();
-            console.log(
-              `${cfg.name} features:`,
-              data.features ? data.features.length : "no features array",
-              "bounds:",
-              bounds
-            );
-
-            if (bounds.isValid()) {
-              if (allBounds) {
-                allBounds.extend(bounds);
-              } else {
-                allBounds = bounds;
-              }
-              map.fitBounds(allBounds);
-            }
-          })
-          .catch((err) => {
-            console.error(`Error loading ${cfg.name}:`, err);
-          });
+encLayers.forEach((cfg) => {
+  fetch(cfg.file)
+    .then((response) => {
+      console.log(`Fetching ${cfg.name}:`, cfg.file, "status", response.status);
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      return response.json();
+    })
+    .then((data) => {
+      const layer = L.geoJSON(data, {
+        style: cfg.style,
       });
+
+      layer.addTo(map);
+      layer.bringToFront();
+
+      const bounds = layer.getBounds();
+      console.log(
+        `${cfg.name} features:`,
+        data.features?.length ?? "no features array",
+        "bounds:",
+        bounds
+      );
+
+      if (bounds.isValid()) {
+        if (allBounds) {
+          allBounds.extend(bounds);
+        } else {
+          allBounds = bounds;
+        }
+        map.fitBounds(allBounds);
+      }
+    })
+    .catch((err) => {
+      console.error(`Error loading ${cfg.name}:`, err);
+    });
+});
+
     </script> 
   </body>
   </html>
