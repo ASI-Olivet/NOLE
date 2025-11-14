@@ -42,24 +42,36 @@
   ></script>
 
   <script>
-    /* =========================================================
-       1. Confirm Leaflet loads properly
-    ========================================================= */
+    //Confirm Leaflet loads properly
     console.log("Leaflet version:", L.version);
 
-    /* =========================================================
-       2. Build map and base tile layer
-    ========================================================= */
+    //Build map and base tile layer
     const map = L.map("map").setView([27.77, -82.64], 10);
 
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       maxZoom: 19,
       attribution: "© OpenStreetMap contributors",
     }).addTo(map);
-
     /* =========================================================
-       3. Load ENC GeoJSON layers (full list: 24 layers)
+       3. Lock the map to Tampa Bay bounding box
     ========================================================= */
+
+    // Tampa Bay bounding box
+    // SouthWest corner  [south lat, west lon]
+    // NorthEast corner  [north lat, east lon]
+    const tampaBounds = L.latLngBounds(
+      [27.00, -83.05],   // SW: (south, west)
+      [28.40, -82.10]    // NE: (north, east)
+    );
+
+    // Set map limits
+    map.setMaxBounds(tampaBounds);
+
+    // Add slight "push-back" effect when dragged outside bounds
+    map.setMinZoom(9);
+    map.options.maxBoundsViscosity = 0.9;
+
+    //Load ENC GeoJSON layers (full list: 24 layers)
     const encLayers = [
       // ---- Coastal ----
       {
