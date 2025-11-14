@@ -1,4 +1,4 @@
-  <!-- (HTML): Minimal Leaflet map with Tampa Bay bounds -->
+    <!-- (HTML): Minimal Leaflet map with Tampa Bay bounds -->
   <!DOCTYPE html>
   <html lang="en">
   <head>
@@ -59,26 +59,25 @@
       L.control.scale({ metric: true, imperial: true }).addTo(map);
       // Load ENC Harbour coastline layer (GeoJSON)
       // --- Load one ENC Fairway area layer (test) ---
-      fetch("data/Coastal_Fairway_area_4326.geojson")
-        .then((response) => response.json())
-        .then((data) => {
-          console.log("ENC Fairway loaded, feature count:", data.features ? data.features.length : "no features field");
+      // --- Load ENC layer (WGS84 GeoJSON) ---
+      fetch("Coastal_Bridge_area_4326_clipTB.geojson")
+        .then(response => response.json())
+        .then(data => {
+          console.log("Loaded ENC feature count:", data.features.length);
 
-          const encTestLayer = L.geoJSON(data, {
+          const encLayer = L.geoJSON(data, {
             style: {
-              color: "#00ff00",
+              color: "#ff00ff",
               weight: 2,
-              fillColor: "#00ff00",
-              fillOpacity: 0.4
+              fillColor: "#ff00ff",
+              fillOpacity: 0.3
             }
           }).addTo(map);
 
-          const bounds = encTestLayer.getBounds();
-          console.log("ENC Fairway layer bounds:", bounds);
-
-          encTestLayer.bringToFront();
-          map.fitBounds(bounds);
+          encLayer.bringToFront();
+          map.fitBounds(encLayer.getBounds());
         })
+        .catch(err => console.error("Error loading ENC GeoJSON:", err));
     </script>
   </body>
   </html>
