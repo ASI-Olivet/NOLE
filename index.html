@@ -1,4 +1,4 @@
-<!-- PSEUDOCODE (HTML+JavaScript): Full-page Leaflet map with ENC layers and styled circle markers -->
+<!-- PSEUDOCODE (HTML+JavaScript): Full-page Leaflet map with ENC layers and classified point symbols -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -40,10 +40,8 @@
 
   <script>
     // 1. Center + extended bounding box for Tampa region
-    // Center St. Pete
     const centerStPete = [27.77, -82.64];
 
-    // Extended bounding box around Tampa Bay (slightly beyond clipped ENC extents)
     const tampaBounds = L.latLngBounds(
       [26.9, -83.2],  // SW: a bit farther south & west
       [28.6, -81.9]   // NE: a bit farther north & east
@@ -54,7 +52,7 @@
       minZoom: 9,
       maxZoom: 18,
       maxBounds: tampaBounds,
-      maxBoundsViscosity: 0.9, // elastic edge when kids drag outside
+      maxBoundsViscosity: 0.9,
     }).setView(centerStPete, 11);
 
     // Base layer (OpenStreetMap)
@@ -68,7 +66,88 @@
 
     console.log("Leaflet version:", L.version);
 
-    // 3. Load ENC GeoJSON layers (full list: 24 layers)
+    // 3. Point symbol helper based on classification
+    function makePointMarker(pointClass, latlng) {
+      switch (pointClass) {
+        case "beacon":
+          // beacon: #00FA00, small circle
+          return L.circleMarker(latlng, {
+            radius: 4,
+            color: "#00FA00",
+            weight: 1,
+            fillColor: "#00FA00",
+            fillOpacity: 0.9,
+          });
+
+        case "buoy":
+          // buoy: #0432FF, small circle
+          return L.circleMarker(latlng, {
+            radius: 4,
+            color: "#0432FF",
+            weight: 1,
+            fillColor: "#0432FF",
+            fillOpacity: 0.9,
+          });
+
+        case "coastguard":
+          // coastguard: #FF9300, large square
+          return L.marker(latlng, {
+            icon: L.divIcon({
+              className: "",
+              html:
+                '<div style="width:16px;height:16px;background:#FF9300;"></div>',
+              iconSize: [16, 16],
+              iconAnchor: [8, 8],
+            }),
+          });
+
+        case "fog-signal":
+          // fog signal: #FFFC00, medium circle
+          return L.circleMarker(latlng, {
+            radius: 6,
+            color: "#FFFC00",
+            weight: 1,
+            fillColor: "#FFFC00",
+            fillOpacity: 0.9,
+          });
+
+        case "offshore-platform":
+          // off shore platform: #008F00, medium square
+          return L.marker(latlng, {
+            icon: L.divIcon({
+              className: "",
+              html:
+                '<div style="width:12px;height:12px;background:#008F00;"></div>',
+              iconSize: [12, 12],
+              iconAnchor: [6, 6],
+            }),
+          });
+
+        case "wreck":
+          // wreck: #FF0000, medium X
+          return L.marker(latlng, {
+            icon: L.divIcon({
+              className: "",
+              html:
+                '<div style="color:#FF0000;font-size:16px;font-weight:bold;line-height:14px;">×</div>',
+              iconSize: [16, 16],
+              iconAnchor: [8, 7],
+            }),
+          });
+
+        default:
+          // Fallback: small neutral circle
+          return L.circleMarker(latlng, {
+            radius: 4,
+            color: "#ffffff",
+            weight: 1,
+            fillColor: "#ffffff",
+            fillOpacity: 0.7,
+          });
+      }
+    }
+
+    // 4. ENC GeoJSON layers (polygons/lines + points with classification)
     const encLayers = [
       // ---- Coastal ----
       {
@@ -84,24 +163,12 @@
       {
         name: "Coastal Buoy Lateral",
         file: "Coastal_Buoy_Lateral_point_4326_clipTB.geojson",
-        style: {
-          color: "#00ffff",
-          weight: 2,
-          fillColor: "#00ffff",
-          fillOpacity: 0.8,
-          radius: 5,
-        },
+        pointClass: "buoy",
       },
       {
         name: "Coastal Buoy Safe Water",
         file: "Coastal_Buoy_Safe_Water_point_4326_clipTB.geojson",
-        style: {
-          color: "#00ffff",
-          weight: 2,
-          fillColor: "#00ffff",
-          fillOpacity: 0.8,
-          radius: 5,
-        },
+        pointClass: "buoy",
       },
       {
         name: "Coastal Fairway (clipped)",
@@ -116,37 +183,19 @@
       {
         name: "Coastal Radar Transponder Beacons",
         file: "Coastal_Radar_Transponder_Beacon_point_4326_clipTB.geojson",
-        style: {
-          color: "#ffff00",
-          weight: 2,
-          fillColor: "#ffff00",
-          fillOpacity: 0.8,
-          radius: 5,
-        },
+        pointClass: "beacon",
       },
       {
         name: "Coastal Wrecks",
         file: "Coastal_Wreck_point_4326_clipTB.geojson",
-        style: {
-          color: "#ff0000",
-          weight: 2,
-          fillColor: "#ff0000",
-          fillOpacity: 0.8,
-          radius: 5,
-        },
+        pointClass: "wreck",
       },
 
       // ---- General ----
       {
         name: "General Buoy Special Purpose",
         file: "General_Buoy_Special_Purpose_General_point_4326_clipTB.geojson",
-        style: {
-          color: "#00ffff",
-          weight: 2,
-          fillColor: "#00ffff",
-          fillOpacity: 0.8,
-          radius: 5,
-        },
+        pointClass: "buoy",
       },
       {
         name: "General Obstructions",
@@ -163,13 +212,7 @@
       {
         name: "Harbour Buoy Special Purpose",
         file: "Harbour_Buoy_Special_Purpose_General_point_4326_clipTB.geojson",
-        style: {
-          color: "#00ffff",
-          weight: 2,
-          fillColor: "#00ffff",
-          fillOpacity: 0.8,
-          radius: 5,
-        },
+        pointClass: "buoy",
       },
       {
         name: "Harbour Submarine Cables",
@@ -182,13 +225,7 @@
       {
         name: "Harbour Coastguard Stations",
         file: "Harbour_Coastguard_Station_point_4326_clipTB.geojson",
-        style: {
-          color: "#ffffff",
-          weight: 2,
-          fillColor: "#ffffff",
-          fillOpacity: 0.9,
-          radius: 5,
-        },
+        pointClass: "coastguard",
       },
       {
         name: "Harbour Coastline",
@@ -211,13 +248,7 @@
       {
         name: "Harbour Fog Signals",
         file: "Harbour_Fog_Signal_point_4326_clipTB.geojson",
-        style: {
-          color: "#ffff00",
-          weight: 2,
-          fillColor: "#ffff00",
-          fillOpacity: 0.8,
-          radius: 5,
-        },
+        pointClass: "fog-signal",
       },
       {
         name: "Harbour Marine Farms",
@@ -260,96 +291,5 @@
         },
       },
       {
-        name: "Harbour Offshore Platforms",
-        file: "Harbour_Offshore_Platform_point_4326_clipTB.geojson",
-        style: {
-          color: "#ff0000",
-          weight: 2,
-          fillColor: "#ff0000",
-          fillOpacity: 0.8,
-          radius: 5,
-        },
-      },
-      {
-        name: "Harbour Radar Transponder Beacons",
-        file: "Harbour_Radar_Transponder_Beacon_point_4326_clipTB.geojson",
-        style: {
-          color: "#ffff00",
-          weight: 2,
-          fillColor: "#ffff00",
-          fillOpacity: 0.8,
-          radius: 5,
-        },
-      },
-      {
-        name: "Harbour Wrecks",
-        file: "Harbour_Wreck_point_4326_clipTB.geojson",
-        style: {
-          color: "#ff0000",
-          weight: 2,
-          fillColor: "#ff0000",
-          fillOpacity: 0.8,
-          radius: 5,
-        },
-      },
 
-      // ---- Overview ----
-      {
-        name: "Overview Wrecks",
-        file: "Overview_Wreck_point_4326_clipTB.geojson",
-        style: {
-          color: "#ff0000",
-          weight: 2,
-          fillColor: "#ff0000",
-          fillOpacity: 0.8,
-          radius: 5,
-        },
-      },
-    ];
-
-    // 4. Fetch and draw each layer
-    encLayers.forEach((cfg) => {
-      fetch(cfg.file)
-        .then((response) => {
-          console.log(`Fetching ${cfg.name}:`, cfg.file, "status", response.status);
-          if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
-          }
-          return response.json();
-        })
-        .then((data) => {
-          console.log(
-            `${cfg.name} features:`,
-            Array.isArray(data.features) ? data.features.length : "no features array"
-          );
-
-          const layer = L.geoJSON(data, {
-            // Style for polygons/lines
-            style: cfg.style,
-
-            // Special handling for points: draw as circleMarkers using same style
-            pointToLayer: (feature, latlng) => {
-              console.log("pointToLayer used for", cfg.name);
-              return L.circleMarker(latlng, {
-                color: cfg.style.color || "#ffffff",
-                weight: cfg.style.weight ?? 2,
-                fillColor: cfg.style.fillColor || cfg.style.color || "#ffffff",
-                fillOpacity: cfg.style.fillOpacity ?? 0.9,
-                radius: cfg.style.radius ?? 5,
-              });
-            },
-          });
-
-          layer.addTo(map);
-          layer.bringToFront();
-        })
-        .catch((err) => {
-          console.error(`Error loading ${cfg.name}:`, err);
-        });
-    });
-
-    // Re-assert bounds after layers (extra safety, in case anything nudges view)
-    map.setMaxBounds(tampaBounds);
-  </script>
-</body>
-</html>
+      
