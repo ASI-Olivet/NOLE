@@ -23,8 +23,8 @@
       padding: 0;
     }
 
-    /* Optional: slightly bigger tooltip text for kids */
-    .nole-tooltip {
+    /* Kid-friendly popup text */
+    .nole-popup-label {
       font-size: 14px;
       font-weight: 600;
     }
@@ -66,10 +66,15 @@
 
     console.log("Leaflet version:", L.version);
 
-    // Point symbology helper (like a CS50 helper function)
+    // Point symbology helper
+    // beacon       -> #00FA00 small circle
+    // buoy         -> #0432FF small circle
+    // coastguard   -> #FF9300 large square
+    // fog signal   -> #FFFC00 medium circle
+    // offshore     -> #008F00 medium square
+    // wreck        -> #FF0000 medium X
     function makePointMarker(pointClass, latlng) {
       if (pointClass === "beacon") {
-        // beacon -> #00FA00 small circle
         return L.circleMarker(latlng, {
           radius: 4,
           color: "#00FA00",
@@ -78,7 +83,6 @@
           fillOpacity: 0.9
         });
       } else if (pointClass === "buoy") {
-        // buoy -> #0432FF small circle
         return L.circleMarker(latlng, {
           radius: 4,
           color: "#0432FF",
@@ -87,7 +91,6 @@
           fillOpacity: 0.9
         });
       } else if (pointClass === "coastguard") {
-        // coastguard -> #FF9300 large square
         return L.marker(latlng, {
           icon: L.divIcon({
             className: "",
@@ -98,7 +101,6 @@
           })
         });
       } else if (pointClass === "fog-signal") {
-        // fog signal -> #FFFC00 medium circle
         return L.circleMarker(latlng, {
           radius: 6,
           color: "#FFFC00",
@@ -107,7 +109,6 @@
           fillOpacity: 0.9
         });
       } else if (pointClass === "offshore-platform") {
-        // offshore platform -> #008F00 medium square
         return L.marker(latlng, {
           icon: L.divIcon({
             className: "",
@@ -118,7 +119,6 @@
           })
         });
       } else if (pointClass === "wreck") {
-        // wreck -> #FF0000 medium X
         return L.marker(latlng, {
           icon: L.divIcon({
             className: "",
@@ -140,8 +140,7 @@
       }
     }
 
-    // ENC layer configuration (like global config structs in C)
-    //   Now includes `label` for kid-friendly tooltips.
+    // ENC layer configuration (labels for popups)
     var encLayers = [
       // ---- Coastal ----
       {
@@ -330,7 +329,7 @@
       }
     ];
 
-    // Load each layer (this is your “main loop”)
+    // Load each layer and attach popups
     encLayers.forEach(function (cfg) {
       fetch(cfg.file)
         .then(function (response) {
@@ -357,13 +356,10 @@
               return makePointMarker("default", latlng);
             },
             onEachFeature: function (feature, lyr) {
-              // Tooltip text: kid-friendly label if available, otherwise layer name
+              // Popup text: kid-friendly
               var text = cfg.label || cfg.name;
-              lyr.bindTooltip(text, {
-                direction: "top",
-                sticky: true,
-                className: "nole-tooltip"
-              });
+              var html = '<div class="nole-popup-label">' + text + '</div>';
+              lyr.bindPopup(html);
             }
           });
 
