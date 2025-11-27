@@ -22,6 +22,12 @@
       margin: 0;
       padding: 0;
     }
+
+    /* Optional: slightly bigger tooltip text for kids */
+    .nole-tooltip {
+      font-size: 14px;
+      font-weight: 600;
+    }
   </style>
 </head>
 
@@ -36,7 +42,7 @@
   ></script>
 
   <script>
-    // 1. Base map setup
+    // Base map setup
     var centerStPete = [27.77, -82.64];
 
     var tampaBounds = L.latLngBounds(
@@ -60,16 +66,10 @@
 
     console.log("Leaflet version:", L.version);
 
-    // 2. Point symbology helper
-    // Classification you requested:
-    // beacon       -> #00FA00 small circle
-    // buoy         -> #0432FF small circle
-    // coastguard   -> #FF9300 large square
-    // fog signal   -> #FFFC00 medium circle
-    // offshore     -> #008F00 medium square
-    // wreck        -> #FF0000 medium X
+    // Point symbology helper (like a CS50 helper function)
     function makePointMarker(pointClass, latlng) {
       if (pointClass === "beacon") {
+        // beacon -> #00FA00 small circle
         return L.circleMarker(latlng, {
           radius: 4,
           color: "#00FA00",
@@ -78,6 +78,7 @@
           fillOpacity: 0.9
         });
       } else if (pointClass === "buoy") {
+        // buoy -> #0432FF small circle
         return L.circleMarker(latlng, {
           radius: 4,
           color: "#0432FF",
@@ -86,6 +87,7 @@
           fillOpacity: 0.9
         });
       } else if (pointClass === "coastguard") {
+        // coastguard -> #FF9300 large square
         return L.marker(latlng, {
           icon: L.divIcon({
             className: "",
@@ -96,6 +98,7 @@
           })
         });
       } else if (pointClass === "fog-signal") {
+        // fog signal -> #FFFC00 medium circle
         return L.circleMarker(latlng, {
           radius: 6,
           color: "#FFFC00",
@@ -104,6 +107,7 @@
           fillOpacity: 0.9
         });
       } else if (pointClass === "offshore-platform") {
+        // offshore platform -> #008F00 medium square
         return L.marker(latlng, {
           icon: L.divIcon({
             className: "",
@@ -114,6 +118,7 @@
           })
         });
       } else if (pointClass === "wreck") {
+        // wreck -> #FF0000 medium X
         return L.marker(latlng, {
           icon: L.divIcon({
             className: "",
@@ -124,7 +129,7 @@
           })
         });
       } else {
-        // default small white circle, just in case
+        // default small white circle
         return L.circleMarker(latlng, {
           radius: 4,
           color: "#ffffff",
@@ -135,12 +140,14 @@
       }
     }
 
-    // 3. Layer list (polygons/lines + classified point layers)
+    // ENC layer configuration (like global config structs in C)
+    //   Now includes `label` for kid-friendly tooltips.
     var encLayers = [
       // ---- Coastal ----
       {
         name: "Coastal Bridges",
         file: "Coastal_Bridge_area_4326_clipTB.geojson",
+        label: "Bridge",
         style: {
           color: "#ff00ff",
           weight: 2,
@@ -151,16 +158,19 @@
       {
         name: "Coastal Buoy Lateral",
         file: "Coastal_Buoy_Lateral_point_4326_clipTB.geojson",
+        label: "Buoy",
         pointClass: "buoy"
       },
       {
         name: "Coastal Buoy Safe Water",
         file: "Coastal_Buoy_Safe_Water_point_4326_clipTB.geojson",
+        label: "Buoy",
         pointClass: "buoy"
       },
       {
         name: "Coastal Fairway (clipped)",
         file: "Coastal_Fairway_area_4326_clipTB.geojson",
+        label: "Ship Fairway",
         style: {
           color: "#00ff00",
           weight: 2,
@@ -171,11 +181,13 @@
       {
         name: "Coastal Radar Transponder Beacons",
         file: "Coastal_Radar_Transponder_Beacon_point_4326_clipTB.geojson",
+        label: "Beacon",
         pointClass: "beacon"
       },
       {
         name: "Coastal Wrecks",
         file: "Coastal_Wreck_point_4326_clipTB.geojson",
+        label: "Wreck",
         pointClass: "wreck"
       },
 
@@ -183,11 +195,13 @@
       {
         name: "General Buoy Special Purpose",
         file: "General_Buoy_Special_Purpose_General_point_4326_clipTB.geojson",
+        label: "Buoy",
         pointClass: "buoy"
       },
       {
         name: "General Obstructions",
         file: "General_Obstruction_area_4326_clipTB.geojson",
+        label: "Obstruction",
         style: {
           color: "#ff6600",
           weight: 2,
@@ -200,11 +214,13 @@
       {
         name: "Harbour Buoy Special Purpose",
         file: "Harbour_Buoy_Special_Purpose_General_point_4326_clipTB.geojson",
+        label: "Buoy",
         pointClass: "buoy"
       },
       {
         name: "Harbour Submarine Cables",
         file: "Harbour_Cable_Submarine_line_4326_clipTB.geojson",
+        label: "Subsea Cable",
         style: {
           color: "#00ffff",
           weight: 2
@@ -213,11 +229,13 @@
       {
         name: "Harbour Coastguard Stations",
         file: "Harbour_Coastguard_Station_point_4326_clipTB.geojson",
+        label: "Military",
         pointClass: "coastguard"
       },
       {
         name: "Harbour Coastline",
         file: "Harbour_Coastline_line_4326_clipTB.geojson",
+        label: "coastline",
         style: {
           color: "#ffffff",
           weight: 1
@@ -226,6 +244,7 @@
       {
         name: "Harbour Fairways",
         file: "Harbour_Fairway_area_4326_clipTB.geojson",
+        label: "Ship Fairway",
         style: {
           color: "#0000ff",
           weight: 2,
@@ -236,11 +255,13 @@
       {
         name: "Harbour Fog Signals",
         file: "Harbour_Fog_Signal_point_4326_clipTB.geojson",
+        label: "Fog Signal",
         pointClass: "fog-signal"
       },
       {
         name: "Harbour Marine Farms",
         file: "Harbour_Marine_Farm_Culture_area_4326_clipTB.geojson",
+        label: "Aqua Farm",
         style: {
           color: "#00ff88",
           weight: 2,
@@ -251,6 +272,7 @@
       {
         name: "Harbour Military Practice Areas",
         file: "Harbour_Military_Practice_Area_4326_clipTB.geojson",
+        label: "Military",
         style: {
           color: "#ff0000",
           weight: 2,
@@ -263,6 +285,7 @@
       {
         name: "Harbour Navigation Lines",
         file: "Harbour_Navigation_Line_4326_clipTB.geojson",
+        label: "Navigation Line",
         style: {
           color: "#00ffff",
           weight: 2
@@ -271,6 +294,7 @@
       {
         name: "Harbour Obstructions",
         file: "Harbour_Obstruction_area_4326_clipTB.geojson",
+        label: "Obstruction",
         style: {
           color: "#ff3300",
           weight: 2,
@@ -281,16 +305,19 @@
       {
         name: "Harbour Offshore Platforms",
         file: "Harbour_Offshore_Platform_point_4326_clipTB.geojson",
+        label: "Offshore Platform",
         pointClass: "offshore-platform"
       },
       {
         name: "Harbour Radar Transponder Beacons",
         file: "Harbour_Radar_Transponder_Beacon_point_4326_clipTB.geojson",
+        label: "Beacon",
         pointClass: "beacon"
       },
       {
         name: "Harbour Wrecks",
         file: "Harbour_Wreck_point_4326_clipTB.geojson",
+        label: "Wreck",
         pointClass: "wreck"
       },
 
@@ -298,11 +325,12 @@
       {
         name: "Overview Wrecks",
         file: "Overview_Wreck_point_4326_clipTB.geojson",
+        label: "Wreck",
         pointClass: "wreck"
       }
     ];
 
-    // 4. Load each layer
+    // Load each layer (this is your “main loop”)
     encLayers.forEach(function (cfg) {
       fetch(cfg.file)
         .then(function (response) {
@@ -323,11 +351,19 @@
           var layer = L.geoJSON(data, {
             style: cfg.style,
             pointToLayer: function (feature, latlng) {
-              // Only used for point / multipoint geometries
               if (cfg.pointClass) {
                 return makePointMarker(cfg.pointClass, latlng);
               }
               return makePointMarker("default", latlng);
+            },
+            onEachFeature: function (feature, lyr) {
+              // Tooltip text: kid-friendly label if available, otherwise layer name
+              var text = cfg.label || cfg.name;
+              lyr.bindTooltip(text, {
+                direction: "top",
+                sticky: true,
+                className: "nole-tooltip"
+              });
             }
           });
 
@@ -339,9 +375,8 @@
         });
     });
 
-    // 5. Re-assert bounds
+    // Re-assert bounds
     map.setMaxBounds(tampaBounds);
   </script>
 </body>
 </html>
-
