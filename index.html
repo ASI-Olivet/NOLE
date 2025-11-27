@@ -1,3 +1,4 @@
+<!-- PSEUDOCODE (HTML+JavaScript): Full-page Leaflet map with ENC layers and styled circle markers -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -38,25 +39,22 @@
   ></script>
 
   <script>
-    
     // 1. Center + extended bounding box for Tampa region
     // Center St. Pete
     const centerStPete = [27.77, -82.64];
-    // Extended bounding box around Tampa Bay:
-    // Slightly beyond clipped ENC extents
+
+    // Extended bounding box around Tampa Bay (slightly beyond clipped ENC extents)
     const tampaBounds = L.latLngBounds(
       [26.9, -83.2],  // SW: a bit farther south & west
       [28.6, -81.9]   // NE: a bit farther north & east
     );
 
     // 2. Create map, lock bounds, set zoom limits
-
     const map = L.map("map", {
       minZoom: 9,
       maxZoom: 18,
       maxBounds: tampaBounds,
-      maxBoundsViscosity: 0.9, 
-      // elastic edge when kids drag outside
+      maxBoundsViscosity: 0.9, // elastic edge when kids drag outside
     }).setView(centerStPete, 11);
 
     // Base layer (OpenStreetMap)
@@ -71,7 +69,6 @@
     console.log("Leaflet version:", L.version);
 
     // 3. Load ENC GeoJSON layers (full list: 24 layers)
-
     const encLayers = [
       // ---- Coastal ----
       {
@@ -90,6 +87,9 @@
         style: {
           color: "#00ffff",
           weight: 2,
+          fillColor: "#00ffff",
+          fillOpacity: 0.8,
+          radius: 5,
         },
       },
       {
@@ -98,6 +98,9 @@
         style: {
           color: "#00ffff",
           weight: 2,
+          fillColor: "#00ffff",
+          fillOpacity: 0.8,
+          radius: 5,
         },
       },
       {
@@ -116,6 +119,9 @@
         style: {
           color: "#ffff00",
           weight: 2,
+          fillColor: "#ffff00",
+          fillOpacity: 0.8,
+          radius: 5,
         },
       },
       {
@@ -124,6 +130,9 @@
         style: {
           color: "#ff0000",
           weight: 2,
+          fillColor: "#ff0000",
+          fillOpacity: 0.8,
+          radius: 5,
         },
       },
 
@@ -134,6 +143,9 @@
         style: {
           color: "#00ffff",
           weight: 2,
+          fillColor: "#00ffff",
+          fillOpacity: 0.8,
+          radius: 5,
         },
       },
       {
@@ -154,6 +166,9 @@
         style: {
           color: "#00ffff",
           weight: 2,
+          fillColor: "#00ffff",
+          fillOpacity: 0.8,
+          radius: 5,
         },
       },
       {
@@ -170,6 +185,9 @@
         style: {
           color: "#ffffff",
           weight: 2,
+          fillColor: "#ffffff",
+          fillOpacity: 0.9,
+          radius: 5,
         },
       },
       {
@@ -196,6 +214,9 @@
         style: {
           color: "#ffff00",
           weight: 2,
+          fillColor: "#ffff00",
+          fillOpacity: 0.8,
+          radius: 5,
         },
       },
       {
@@ -244,6 +265,9 @@
         style: {
           color: "#ff0000",
           weight: 2,
+          fillColor: "#ff0000",
+          fillOpacity: 0.8,
+          radius: 5,
         },
       },
       {
@@ -252,6 +276,9 @@
         style: {
           color: "#ffff00",
           weight: 2,
+          fillColor: "#ffff00",
+          fillOpacity: 0.8,
+          radius: 5,
         },
       },
       {
@@ -260,21 +287,27 @@
         style: {
           color: "#ff0000",
           weight: 2,
+          fillColor: "#ff0000",
+          fillOpacity: 0.8,
+          radius: 5,
         },
       },
 
       // ---- Overview ----
-
       {
         name: "Overview Wrecks",
         file: "Overview_Wreck_point_4326_clipTB.geojson",
         style: {
           color: "#ff0000",
           weight: 2,
+          fillColor: "#ff0000",
+          fillOpacity: 0.8,
+          radius: 5,
         },
       },
     ];
 
+    // 4. Fetch and draw each layer
     encLayers.forEach((cfg) => {
       fetch(cfg.file)
         .then((response) => {
@@ -291,18 +324,24 @@
           );
 
           const layer = L.geoJSON(data, {
-  // Style for polygons/lines
+            // Style for polygons/lines
             style: cfg.style,
 
-  // Special handling for points: draw as circleMarkers using same style
+            // Special handling for points: draw as circleMarkers using same style
             pointToLayer: (feature, latlng) => {
-              return L.circleMarker(latlng, cfg.style);
+              console.log("pointToLayer used for", cfg.name);
+              return L.circleMarker(latlng, {
+                color: cfg.style.color || "#ffffff",
+                weight: cfg.style.weight ?? 2,
+                fillColor: cfg.style.fillColor || cfg.style.color || "#ffffff",
+                fillOpacity: cfg.style.fillOpacity ?? 0.9,
+                radius: cfg.style.radius ?? 5,
+              });
             },
           });
 
           layer.addTo(map);
           layer.bringToFront();
-
         })
         .catch((err) => {
           console.error(`Error loading ${cfg.name}:`, err);
