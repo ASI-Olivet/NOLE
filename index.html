@@ -1,4 +1,4 @@
-<!-- PSEUDOCODE (HTML+JavaScript): Full-page Leaflet map with ENC layers and classified point symbols -->
+<!--(HTML+JavaScript): Full-page Leaflet map with ENC layers and classified point symbols -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -39,7 +39,7 @@
   ></script>
 
   <script>
-    // 1. Center + extended bounding box for Tampa region
+    // Center + extended bounding box for Tampa region
     const centerStPete = [27.77, -82.64];
 
     const tampaBounds = L.latLngBounds(
@@ -47,7 +47,7 @@
       [28.6, -81.9]   // NE: a bit farther north & east
     );
 
-    // 2. Create map, lock bounds, set zoom limits
+    // Create map, lock bounds, set zoom limits
     const map = L.map("map", {
       minZoom: 9,
       maxZoom: 18,
@@ -66,7 +66,7 @@
 
     console.log("Leaflet version:", L.version);
 
-    // 3. Point symbol helper based on classification
+    // Point symbol helper based on classification
     function makePointMarker(pointClass, latlng) {
       switch (pointClass) {
         case "beacon":
@@ -147,7 +147,7 @@
       }
     }
 
-    // 4. ENC GeoJSON layers (polygons/lines + points with classification)
+    // ENC GeoJSON layers (polygons/lines + points with classification)
     const encLayers = [
       // ---- Coastal ----
       {
