@@ -291,11 +291,18 @@
           );
 
           const layer = L.geoJSON(data, {
+  // Style for polygons/lines
             style: cfg.style,
+
+  // Special handling for points: draw as circleMarkers using same style
+            pointToLayer: (feature, latlng) => {
+              return L.circleMarker(latlng, cfg.style);
+            },
           });
 
           layer.addTo(map);
           layer.bringToFront();
+
         })
         .catch((err) => {
           console.error(`Error loading ${cfg.name}:`, err);
