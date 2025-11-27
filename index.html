@@ -38,28 +38,25 @@
   ></script>
 
   <script>
-    // =========================================================
+    
     // 1. Center + extended bounding box for Tampa region
-    // =========================================================
-
     // Center St. Pete
     const centerStPete = [27.77, -82.64];
-
     // Extended bounding box around Tampa Bay:
-    // Slightly beyond clipped ENC extents, but still "Tampa world"
+    // Slightly beyond clipped ENC extents
     const tampaBounds = L.latLngBounds(
       [26.9, -83.2],  // SW: a bit farther south & west
       [28.6, -81.9]   // NE: a bit farther north & east
     );
 
-    // =========================================================
     // 2. Create map, lock bounds, set zoom limits
-    // =========================================================
+
     const map = L.map("map", {
       minZoom: 9,
       maxZoom: 18,
       maxBounds: tampaBounds,
-      maxBoundsViscosity: 0.9, // elastic edge when kids drag outside
+      maxBoundsViscosity: 0.9, 
+      // elastic edge when kids drag outside
     }).setView(centerStPete, 11);
 
     // Base layer (OpenStreetMap)
@@ -73,9 +70,8 @@
 
     console.log("Leaflet version:", L.version);
 
-    // =========================================================
     // 3. Load ENC GeoJSON layers (full list: 24 layers)
-    // =========================================================
+
     const encLayers = [
       // ---- Coastal ----
       {
