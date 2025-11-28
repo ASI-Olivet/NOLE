@@ -47,9 +47,10 @@
     // --------------------------------------------------------------------
     var centerStPete = [27.77, -82.64];
 
+    // Tampa Bay bounding box — these are the canonical values
     var tampaBounds = L.latLngBounds(
-      [26.9, -83.2],   // SW
-      [28.6, -81.9]    // NE
+      [26.9, -83.2],   // SW (lat, lon)
+      [28.6, -81.9]    // NE (lat, lon)
     );
 
     var map = L.map("map", {
@@ -70,13 +71,13 @@
 
     // --------------------------------------------------------------------
     // 2. Point symbology helper for ENC features
+    //    beacon       -> #00FA00 small circle
+    //    buoy         -> #0432FF small circle
+    //    coastguard   -> #FF9300 large square
+    //    fog signal   -> #FFFC00 medium circle
+    //    offshore     -> #008F00 medium square
+    //    wreck        -> #FF0000 medium X
     // --------------------------------------------------------------------
-    // beacon       -> #00FA00 small circle
-    // buoy         -> #0432FF small circle
-    // coastguard   -> #FF9300 large square
-    // fog signal   -> #FFFC00 medium circle
-    // offshore     -> #008F00 medium square
-    // wreck        -> #FF0000 medium X
     function makePointMarker(pointClass, latlng) {
       if (pointClass === "beacon") {
         return L.circleMarker(latlng, {
@@ -306,7 +307,7 @@
       },
       {
         name: "Harbour Offshore Platforms",
-        file: "Harbour_Offshore_Offshore_Platform_point_4326_clipTB.geojson",
+        file: "Harbour_Offshore_Platform_point_4326_clipTB.geojson",
         label: "Offshore Platform",
         pointClass: "offshore-platform"
       },
@@ -376,12 +377,14 @@
     });
 
     // --------------------------------------------------------------------
-    // 5. Demo ships layer (local only, no API)
+    // 5. Global Fishing Watch via Cloudflare Worker proxy (real ships)
     // --------------------------------------------------------------------
-    const demoShipsLayer = L.layerGroup().addTo(map);
+    const GFW_PROXY_URL = "https://nole-gfw-proxy.asw5230.workers.dev";
 
-    function makeShipIcon(headingDeg) {
-      const rotation = Number.isFinite(headingDeg) ? headingDeg : 0;
+    const gfwLayer = L.layerGroup().addTo(map);
+
+    function makeShipIcon(deg) {
+      const rotation = Number.isFinite(deg) ? deg : 0;
       return L.divIcon({
         className: "",
         iconSize: [24, 24],
@@ -391,83 +394,166 @@
           'width:0;height:0;' +
           'border-left:6px solid transparent;' +
           'border-right:6px solid transparent;' +
-          'border-bottom:12px solid #00e0ff;' +
+          'border-bottom:14px solid #00e0ff;' +
           'transform:rotate(' + rotation + 'deg);' +
           'transform-origin:center center;' +
           '"></div>'
       });
     }
 
-    // Simple demo ships with positions in Tampa Bay
-    const demoShips = [
-      {
-        name: "Blue Dolphin",
-        lat: 27.75,
-        lon: -82.65,
-        heading: 45,      // NE
-        speedKmPerStep: 0.3
-      },
-      {
-        name: "Sea Turtle",
-        lat: 27.7,
-        lon: -82.6,
-        heading: 135,     // SE
-        speedKmPerStep: 0.25
-      },
-      {
-        name: "Pelican Patrol",
-        lat: 27.8,
-        lon: -82.7,
-        heading: 300,     // NW
-        speedKmPerStep: 0.2
-      }
-    ];
+    function buildGfwUrl() {
+      // IMPORTANT:
+      // GFW must receive bbox in the SAME ORDER you use in the API explorer.
+      // Here we send [minLat, minLon, maxLat, maxLon] to avoid lon/lat swap.
+      const minLat = 26.9;
+      const minLon = -83.2;
+      const maxLat = 28.6;
+      const maxLon = -81.9;
 
-    // Rough conversion: ~111 km per degree latitude; adjust lon by cos(lat)
-    function moveShip(ship) {
-      const headingRad = (ship.heading * Math.PI) / 180;
-      const dKm = ship.speedKmPerStep;
-      const dLat = (dKm / 111.0) * Math.cos(headingRad);
-      const dLon = (dKm / (111.0 * Math.cos(ship.lat * Math.PI / 180))) * Math.sin(headingRad);
+      const params = [
+        "bbox=" + [minLat, minLon, maxLat, maxLon].join(","),  // lat,lon,lat,lon
+        "limit=200"
+      ];
 
-      ship.lat += dLat;
-      ship.lon += dLon;
-
-      // If it leaves Tampa bounds, wrap it back near center
-      if (!tampaBounds.contains([ship.lat, ship.lon])) {
-        ship.lat = centerStPete[0];
-        ship.lon = centerStPete[1];
-      }
+      return GFW_PROXY_URL + "?" + params.join("&");
     }
 
-    const demoShipMarkers = demoShips.map(function (ship) {
-      const icon = makeShipIcon(ship.heading);
-      const marker = L.marker([ship.lat, ship.lon], { icon: icon });
-      marker.bindPopup(
-        '<div class="nole-popup-label">' + ship.name + '</div>' +
-        '<div>Demo ship for practice</div>'
-      );
-      marker.addTo(demoShipsLayer);
-      return marker;
-    });
+    function fetchGfwVessels() {
+      const url = buildGfwUrl();
+      console.log("Fetching vessels via GFW proxy:", url);
 
-    // Update positions every second
-    setInterval(function () {
-      demoShips.forEach(function (ship, index) {
-        moveShip(ship);
-        const marker = demoShipMarkers[index];
-        marker.setLatLng([ship.lat, ship.lon]);
-        marker.setIcon(makeShipIcon(ship.heading));
-      });
-    }, 1000);
+      fetch(url)
+        .then(function (response) {
+          console.log("GFW proxy response status:", response.status);
+          if (!response.ok) {
+            throw new Error("Proxy HTTP " + response.status);
+          }
+          return response.json();
+        })
+        .then(function (data) {
+          console.log("Raw GFW proxy JSON:", data);
 
-    // Add to layer control
+          let vessels = [];
+
+          // Case 1: entries with position.lat / position.lon
+          if (Array.isArray(data.entries)) {
+            vessels = data.entries.map(function (e) {
+              if (e.position && e.position.lat != null && e.position.lon != null) {
+                return {
+                  lat: e.position.lat,
+                  lon: e.position.lon,
+                  name: e.vessel && e.vessel.name ? e.vessel.name : (e.name || "Vessel"),
+                  speed: e.fishing && e.fishing.averageSpeedKnots != null
+                    ? e.fishing.averageSpeedKnots
+                    : e.speed,
+                  heading: e.course || e.heading || 0,
+                  raw: e
+                };
+              } else if (e.lat != null && e.lon != null) {
+                // entries[] with lat/lon directly
+                return {
+                  lat: e.lat,
+                  lon: e.lon,
+                  name: e.name || e.shipname || "Vessel",
+                  speed: e.speed,
+                  heading: e.course || e.heading || 0,
+                  raw: e
+                };
+              }
+              return null;
+            }).filter(function (v) { return v !== null; });
+
+            console.log("Parsed vessels from data.entries:", vessels.length);
+          }
+          // Case 2: data.data[] style
+          else if (Array.isArray(data.data)) {
+            vessels = data.data.map(function (e) {
+              if (e.lat != null && e.lon != null) {
+                return {
+                  lat: e.lat,
+                  lon: e.lon,
+                  name: e.name || e.shipname || "Vessel",
+                  speed: e.speed,
+                  heading: e.course || e.heading || 0,
+                  raw: e
+                };
+              }
+              return null;
+            }).filter(function (v) { return v !== null; });
+
+            console.log("Parsed vessels from data.data:", vessels.length);
+          }
+          // Case 3: GeoJSON FeatureCollection
+          else if (Array.isArray(data.features)) {
+            vessels = data.features.map(function (f) {
+              if (
+                f &&
+                f.geometry &&
+                f.geometry.type === "Point" &&
+                Array.isArray(f.geometry.coordinates)
+              ) {
+                const coords = f.geometry.coordinates; // [lon, lat]
+                const lon = coords[0];
+                const lat = coords[1];
+                const props = f.properties || {};
+                return {
+                  lat: lat,
+                  lon: lon,
+                  name: props.name || props.shipname || "Vessel",
+                  speed: props.speed,
+                  heading: props.course || props.heading || 0,
+                  raw: f
+                };
+              }
+              return null;
+            }).filter(function (v) { return v !== null; });
+
+            console.log("Parsed vessels from GeoJSON features:", vessels.length);
+          } else {
+            console.warn("GFW proxy: unrecognized JSON structure.");
+          }
+
+          gfwLayer.clearLayers();
+
+          vessels.forEach(function (v) {
+            if (v.lat == null || v.lon == null) return;
+
+            const icon = makeShipIcon(v.heading);
+
+            let popupHtml = '<div class="nole-popup-label">' + v.name + '</div>';
+            if (v.speed != null) {
+              popupHtml += '<div>Speed: ' + v.speed + ' kn</div>';
+            }
+            if (v.heading != null) {
+              popupHtml += '<div>Heading: ' + v.heading + '°</div>';
+            }
+
+            L.marker([v.lat, v.lon], { icon: icon })
+              .bindPopup(popupHtml)
+              .addTo(gfwLayer);
+          });
+
+          console.log("Vessels drawn on map:", vessels.length);
+        })
+        .catch(function (err) {
+          console.error("Error fetching vessels via proxy:", err);
+        });
+    }
+
+    // Initial fetch + refresh every 60 seconds
+    fetchGfwVessels();
+    setInterval(fetchGfwVessels, 60000);
+
+    // Layer control (only for ships – ENC is always on)
     L.control.layers(
       null,
-      { "Demo Ships": demoShipsLayer },
+      { "Live Vessels (GFW)": gfwLayer },
       { collapsed: true }
     ).addTo(map);
 
+    // --------------------------------------------------------------------
+    // 6. Re-assert bounds
+    // --------------------------------------------------------------------
     map.setMaxBounds(tampaBounds);
   </script>
 </body>
