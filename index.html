@@ -42,15 +42,15 @@
   ></script>
 
   <script>
-
-    // Base map setup
-
+    // --------------------------------------------------------------------
+    // 1. Base map setup
+    // --------------------------------------------------------------------
     var centerStPete = [27.77, -82.64];
 
-    // Tampa Bay bounding box — canonical values
+    // Tampa Bay bounding box (for map limits, Leaflet uses [lat, lon])
     var tampaBounds = L.latLngBounds(
-      [26.9, -83.2],   // SW (lat, lon)
-      [28.6, -81.9]    // NE (lat, lon)
+      [26.9, -83.2],   // SW: (lat, lon)
+      [28.6, -81.9]    // NE: (lat, lon)
     );
 
     var map = L.map("map", {
@@ -69,14 +69,15 @@
 
     console.log("Leaflet version:", L.version);
 
-    //    Point symbology helper for ENC features
+    // --------------------------------------------------------------------
+    // 2. Point symbology helper for ENC features
     //    beacon       -> #00FA00 small circle
     //    buoy         -> #0432FF small circle
     //    coastguard   -> #FF9300 large square
     //    fog signal   -> #FFFC00 medium circle
     //    offshore     -> #008F00 medium square
     //    wreck        -> #FF0000 medium X
-    
+    // --------------------------------------------------------------------
     function makePointMarker(pointClass, latlng) {
       if (pointClass === "beacon") {
         return L.circleMarker(latlng, {
@@ -141,8 +142,9 @@
       }
     }
 
-    // ENC layer configuration (labels for kid-friendly popups)
-
+    // --------------------------------------------------------------------
+    // 3. ENC layer configuration (labels for kid-friendly popups)
+    // --------------------------------------------------------------------
     var encLayers = [
       // ---- Coastal ----
       {
@@ -331,8 +333,9 @@
       }
     ];
 
-    // Load ENC layers and attach kid-friendly popups
- 
+    // --------------------------------------------------------------------
+    // 4. Load ENC layers and attach kid-friendly popups
+    // --------------------------------------------------------------------
     encLayers.forEach(function (cfg) {
       fetch(cfg.file)
         .then(function (response) {
@@ -373,133 +376,131 @@
         });
     });
 
+    // --------------------------------------------------------------------
+    // 5. Port visits from Global Fishing Watch (via Cloudflare proxy)
+    // --------------------------------------------------------------------
+    const GFW_PROXY_URL = "https://nole-gfw-proxy.asw5230.workers.dev";
 
-    // Global Fishing Watch via Cloudflare Worker (Port Visits)
-    const PORT_PROXY_URL = "https://nole-gfw-proxy.asw5230.workers.dev";
+    // Leaflet layer group for port visits
+    const portVisitLayer = L.layerGroup().addTo(map);
 
-    // Layer to hold port visit markers
-    const portVisitsLayer = L.layerGroup().addTo(map);
-
-    // Build the bbox string for the Worker
-    function buildPortVisitsUrl() {
-      // Tampa Bay bounds in [minLon, minLat, maxLon, maxLat]
+    // Build the proxy URL with the same bbox we used to test the Worker
+    function buildPortVisitUrl() {
+      // Tampa Bay bounds for GFW:
+      // GFW bbox format: minLon,minLat,maxLon,maxLat
       const minLat = 26.9;
       const maxLat = 28.6;
       const minLon = -83.2;
       const maxLon = -81.9;
 
       const bbox = [minLon, minLat, maxLon, maxLat].join(",");
-      console.log("Port visits bbox string:", bbox);
+      console.log("Port-visit bbox string:", bbox);
 
       const params = [
-        "bbox=" + encodeURIComponent(bbox),
-        "limit=100"
+        "bbox=" + bbox,
+        "limit=50"
       ];
 
-      return PORT_PROXY_URL + "?" + params.join("&");
+      return GFW_PROXY_URL + "?" + params.join("&");
     }
 
+    // Yellow circle for port visit marker
     function makePortVisitMarker(lat, lon) {
-      // Simple purple-ish circle for port visits
       return L.circleMarker([lat, lon], {
         radius: 7,
-        color: "#a000ff",
+        color: "#ffcc00",
         weight: 2,
-        fillColor: "#d080ff",
+        fillColor: "#ffcc00",
         fillOpacity: 0.9
       });
     }
 
-    function formatDateTime(iso) {
-      if (!iso) return "";
-      // Basic trimming, no heavy formatting
-      return iso.replace("T", " ").replace("Z", " UTC");
-    }
-
     function fetchPortVisits() {
-      const url = buildPortVisitsUrl();
+      const url = buildPortVisitUrl();
       console.log("Fetching port visits via proxy:", url);
 
       fetch(url)
         .then(function (response) {
-          console.log("Port visits proxy response status:", response.status);
+          console.log("Port-visit proxy status:", response.status);
           if (!response.ok) {
             throw new Error("Proxy HTTP " + response.status);
           }
           return response.json();
         })
         .then(function (data) {
-          console.log("Raw port visits JSON:", data);
+          console.log("Raw port-visit JSON:", data);
 
           if (!data || !Array.isArray(data.entries)) {
             console.warn("Port visits: no entries array in response");
             return;
           }
 
-          portVisitsLayer.clearLayers();
+          portVisitLayer.clearLayers();
 
           data.entries.forEach(function (e) {
-            // Expecting e.position.lat / e.position.lon / e.vessel / e.port_visit
-            if (!e.position || e.position.lat == null || e.position.lon == null) return;
+            if (!e.position || e.position.lat == null || e.position.lon == null) {
+              return;
+            }
 
             const lat = e.position.lat;
             const lon = e.position.lon;
 
-            const vesselName =
-              (e.vessel && e.vessel.name) ||
-              (e.vessel && e.vessel.ssvid) ||
-              "Vessel";
+            const name =
+              e.vessel && e.vessel.name
+                ? e.vessel.name
+                : "Vessel";
 
-            const portInfo = e.port_visit || {};
-            const startAnch = portInfo.startAnchorage || {};
-            const endAnch = portInfo.endAnchorage || {};
+            const start = e.start || "";
+            const end = e.end || "";
+
             const portName =
-              startAnch.name ||
-              endAnch.name ||
-              (startAnch.topDestination || endAnch.topDestination) ||
-              "Port";
-
-            const startTime = e.start ? formatDateTime(e.start) : "";
-            const endTime = e.end ? formatDateTime(e.end) : "";
-
-            let popupHtml =
-              '<div class="nole-popup-label">' + vesselName + '</div>' +
-              '<div>Port: ' + portName + '</div>';
-
-            if (startTime || endTime) {
-              popupHtml += '<div>Visit:';
-              if (startTime) popupHtml += '<br>From: ' + startTime;
-              if (endTime) popupHtml += '<br>To: ' + endTime;
-              popupHtml += '</div>';
-            }
+              e.port_visit &&
+              e.port_visit.startAnchorage &&
+              e.port_visit.startAnchorage.name
+                ? e.port_visit.startAnchorage.name
+                : (e.port_visit &&
+                   e.port_visit.endAnchorage &&
+                   e.port_visit.endAnchorage.name) ||
+                  "Port";
 
             const marker = makePortVisitMarker(lat, lon);
-            marker.bindPopup(popupHtml).addTo(portVisitsLayer);
+
+            let popupHtml = '<div class="nole-popup-label">' + name + '</div>';
+            popupHtml += '<div>Event: Port visit</div>';
+            if (portName) {
+              popupHtml += '<div>Port: ' + portName + '</div>';
+            }
+            if (start) {
+              popupHtml += '<div>Arrived: ' + start.slice(0, 10) + '</div>';
+            }
+            if (end) {
+              popupHtml += '<div>Departed: ' + end.slice(0, 10) + '</div>';
+            }
+
+            marker.bindPopup(popupHtml).addTo(portVisitLayer);
           });
 
-          console.log("Port visit markers drawn:", portVisitsLayer.getLayers().length);
+          console.log("Port visits drawn:", data.entries.length);
         })
         .catch(function (err) {
           console.error("Error fetching port visits via proxy:", err);
         });
     }
 
-    // Initial fetch + refresh every 60 seconds (can be relaxed later)
+    // Initial fetch + refresh every 10 minutes
     fetchPortVisits();
-    setInterval(fetchPortVisits, 60000);
+    setInterval(fetchPortVisits, 600000);
 
-    // Layer control (ENC always on, Port Visits togglable)
-
+    // Layer control so kids can toggle port visits
     L.control.layers(
       null,
-      {
-        "Port Visits (GFW)": portVisitsLayer
-      },
+      { "Port visits (GFW)": portVisitLayer },
       { collapsed: true }
     ).addTo(map);
 
-    // Re-assert bounds
-
+    // --------------------------------------------------------------------
+    // 6. Re-assert bounds
+    // --------------------------------------------------------------------
     map.setMaxBounds(tampaBounds);
   </script>
 </body>
