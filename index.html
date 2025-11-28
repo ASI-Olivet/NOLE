@@ -401,24 +401,25 @@
       });
     }
 
-    function buildGfwUrl() {
-      // GFW requires bbox=minLon,minLat,maxLon,maxLat
-      const minLat = 26.9;
-      const maxLat = 28.6;
-      const minLon = -83.2;
-      const maxLon = -81.9;
+   function buildGfwUrl() {
+  // Tampa Bay bounds
+  const minLat = 26.9;
+  const maxLat = 28.6;
+  const minLon = -83.2;
+  const maxLon = -81.9;
 
-      const bbox = [minLon, minLat, maxLon, maxLat].join(",");
+  // GFW requires bbox=minLon,minLat,maxLon,maxLat
+  const bbox = [minLon, minLat, maxLon, maxLat].join(",");
 
-      const params = [
-        "bbox=" + bbox,
-        "limit=200"
-      ];
+  console.log("GFW bbox string:", bbox); // <--- should log "-83.2,26.9,-81.9,28.6"
 
-      return GFW_PROXY_URL + "?" + params.join("&");
-    }
+  const params = [
+    "bbox=" + bbox,
+    "limit=200"
+  ];
 
-
+  return GFW_PROXY_URL + "?" + params.join("&");
+}
     function fetchGfwVessels() {
       const url = buildGfwUrl();
       console.log("Fetching vessels via GFW proxy:", url);
