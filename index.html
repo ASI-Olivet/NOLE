@@ -43,7 +43,7 @@
 
   <script>
 
-    // Base map setup
+    // 1. Base map setup
 
     var centerStPete = [27.77, -82.64];
 
@@ -142,6 +142,7 @@
     }
 
     // ENC layer configuration (labels for kid-friendly popups)
+
     var encLayers = [
       // ---- Coastal ----
       {
@@ -329,7 +330,9 @@
         pointClass: "wreck"
       }
     ];
+
     // Load ENC layers and attach kid-friendly popups
+
     encLayers.forEach(function (cfg) {
       fetch(cfg.file)
         .then(function (response) {
@@ -370,26 +373,17 @@
         });
     });
 
-    // Global Fishing Watch via Cloudflare Worker proxy
+    // Global Fishing Watch via Cloudflare Worker proxy (fishing events)
 
     const GFW_PROXY_URL = "https://nole-gfw-proxy.asw5230.workers.dev";
 
     const gfwLayer = L.layerGroup().addTo(map);
 
-function buildGfwUrl() {
-  // TEMP: bounding box around sample fishing event off Argentina
-  const minLon = -62.8;
-  const minLat = -47.2;
-  const maxLon = -62.7;
-  const maxLat = -47.1;
-
-  const params = [
-    "bbox=" + [minLon, minLat, maxLon, maxLat].join(","),
-    "limit=50"
-  ];
-
-  return GFW_PROXY_URL + "?" + params.join("&");
-}
+    function buildGfwUrl() {
+      const minLon = -83.2;
+      const minLat = 26.9;
+      const maxLon = -81.9;
+      const maxLat = 28.6;
 
       const params = [
         "bbox=" + [minLon, minLat, maxLon, maxLat].join(","),
@@ -397,17 +391,6 @@ function buildGfwUrl() {
       ];
 
       return GFW_PROXY_URL + "?" + params.join("&");
-    }
-
-    function makeFishingEventIcon() {
-      // Simple cyan dot for "fishing boat event"
-      return L.circleMarker([0, 0], {
-        radius: 6,
-        color: "#00e0ff",
-        weight: 2,
-        fillColor: "#00e0ff",
-        fillOpacity: 0.9
-      });
     }
 
     function fetchGfwVessels() {
@@ -480,10 +463,10 @@ function buildGfwUrl() {
       { collapsed: true }
     ).addTo(map);
 
-
+   
     // Re-assert bounds
+   
     map.setMaxBounds(tampaBounds);
   </script>
 </body>
 </html>
-
