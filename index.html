@@ -42,9 +42,9 @@
   ></script>
 
   <script>
-
+    // --------------------------------------------------------------------
     // 1. Base map setup
-
+    // --------------------------------------------------------------------
     var centerStPete = [27.77, -82.64];
 
     var tampaBounds = L.latLngBounds(
@@ -69,14 +69,14 @@
     console.log("Leaflet version:", L.version);
 
     // --------------------------------------------------------------------
-    //    Point symbology helper for ENC features
-    //    beacon       -> #00FA00 small circle
-    //    buoy         -> #0432FF small circle
-    //    coastguard   -> #FF9300 large square
-    //    fog signal   -> #FFFC00 medium circle
-    //    offshore     -> #008F00 medium square
-    //    wreck        -> #FF0000 medium X
+    // 2. Point symbology helper for ENC features
     // --------------------------------------------------------------------
+    // beacon       -> #00FA00 small circle
+    // buoy         -> #0432FF small circle
+    // coastguard   -> #FF9300 large square
+    // fog signal   -> #FFFC00 medium circle
+    // offshore     -> #008F00 medium square
+    // wreck        -> #FF0000 medium X
     function makePointMarker(pointClass, latlng) {
       if (pointClass === "beacon") {
         return L.circleMarker(latlng, {
@@ -141,8 +141,9 @@
       }
     }
 
-    // ENC layer configuration (labels for kid-friendly popups)
-
+    // --------------------------------------------------------------------
+    // 3. ENC layer configuration (labels for kid-friendly popups)
+    // --------------------------------------------------------------------
     var encLayers = [
       // ---- Coastal ----
       {
@@ -305,7 +306,7 @@
       },
       {
         name: "Harbour Offshore Platforms",
-        file: "Harbour_Offshore_Platform_point_4326_clipTB.geojson",
+        file: "Harbour_Offshore_Offshore_Platform_point_4326_clipTB.geojson",
         label: "Offshore Platform",
         pointClass: "offshore-platform"
       },
@@ -331,8 +332,9 @@
       }
     ];
 
-    // Load ENC layers and attach kid-friendly popups
-
+    // --------------------------------------------------------------------
+    // 4. Load ENC layers and attach kid-friendly popups
+    // --------------------------------------------------------------------
     encLayers.forEach(function (cfg) {
       fetch(cfg.file)
         .then(function (response) {
@@ -373,99 +375,9 @@
         });
     });
 
-    // Global Fishing Watch via Cloudflare Worker proxy (fishing events)
-
-    const GFW_PROXY_URL = "https://nole-gfw-proxy.asw5230.workers.dev";
-
-    const gfwLayer = L.layerGroup().addTo(map);
-
-    function buildGfwUrl() {
-      const minLon = -83.2;
-      const minLat = 26.9;
-      const maxLon = -81.9;
-      const maxLat = 28.6;
-
-      const params = [
-        "bbox=" + [minLon, minLat, maxLon, maxLat].join(","),
-        "limit=200"
-      ];
-
-      return GFW_PROXY_URL + "?" + params.join("&");
-    }
-
-    function fetchGfwVessels() {
-      const url = buildGfwUrl();
-      console.log("Fetching fishing events via proxy:", url);
-
-      fetch(url)
-        .then(function (response) {
-          console.log("Proxy response status:", response.status);
-          if (!response.ok) {
-            throw new Error("Proxy HTTP " + response.status);
-          }
-          return response.json();
-        })
-        .then(function (data) {
-          console.log("Raw GFW proxy JSON:", data);
-
-          if (!data || !Array.isArray(data.entries)) {
-            console.warn("GFW proxy: no entries array in response");
-            return;
-          }
-
-          gfwLayer.clearLayers();
-
-          data.entries.forEach(function (e) {
-            // Match the JSON you pasted: position.lat / position.lon / vessel.name / fishing.averageSpeedKnots
-            if (!e.position || e.position.lat == null || e.position.lon == null) return;
-
-            const lat = e.position.lat;
-            const lon = e.position.lon;
-
-            const name = (e.vessel && e.vessel.name) ? e.vessel.name : "Fishing Vessel";
-            const speed = e.fishing && e.fishing.averageSpeedKnots != null
-              ? e.fishing.averageSpeedKnots
-              : null;
-            const eventType = e.type || "fishing";
-
-            let popupHtml = '<div class="nole-popup-label">' + name + '</div>';
-            popupHtml += '<div>Event: ' + eventType + '</div>';
-            if (speed !== null) {
-              popupHtml += '<div>Average Speed: ' + speed.toFixed(1) + ' kn</div>';
-            }
-
-            const marker = L.circleMarker([lat, lon], {
-              radius: 6,
-              color: "#00e0ff",
-              weight: 2,
-              fillColor: "#00e0ff",
-              fillOpacity: 0.9
-            });
-
-            marker.bindPopup(popupHtml).addTo(gfwLayer);
-          });
-
-          console.log("Fishing events drawn:", data.entries.length);
-        })
-        .catch(function (err) {
-          console.error("Error fetching fishing events via proxy:", err);
-        });
-    }
-
-    // Initial fetch + refresh every 60 seconds
-    fetchGfwVessels();
-    setInterval(fetchGfwVessels, 60000);
-
-    // Add a toggle in the layer control for the AIS/fishing-events layer
-    L.control.layers(
-      null,
-      { "Fishing Events (GFW)": gfwLayer },
-      { collapsed: true }
-    ).addTo(map);
-
-   
-    // Re-assert bounds
-   
+    // --------------------------------------------------------------------
+    // 5. Re-assert bounds
+    // --------------------------------------------------------------------
     map.setMaxBounds(tampaBounds);
   </script>
 </body>
