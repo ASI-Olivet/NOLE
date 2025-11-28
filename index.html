@@ -376,8 +376,98 @@
     });
 
     // --------------------------------------------------------------------
-    // 5. Re-assert bounds
+    // 5. Demo ships layer (local only, no API)
     // --------------------------------------------------------------------
+    const demoShipsLayer = L.layerGroup().addTo(map);
+
+    function makeShipIcon(headingDeg) {
+      const rotation = Number.isFinite(headingDeg) ? headingDeg : 0;
+      return L.divIcon({
+        className: "",
+        iconSize: [24, 24],
+        iconAnchor: [12, 12],
+        html:
+          '<div style="' +
+          'width:0;height:0;' +
+          'border-left:6px solid transparent;' +
+          'border-right:6px solid transparent;' +
+          'border-bottom:12px solid #00e0ff;' +
+          'transform:rotate(' + rotation + 'deg);' +
+          'transform-origin:center center;' +
+          '"></div>'
+      });
+    }
+
+    // Simple demo ships with positions in Tampa Bay
+    const demoShips = [
+      {
+        name: "Blue Dolphin",
+        lat: 27.75,
+        lon: -82.65,
+        heading: 45,      // NE
+        speedKmPerStep: 0.3
+      },
+      {
+        name: "Sea Turtle",
+        lat: 27.7,
+        lon: -82.6,
+        heading: 135,     // SE
+        speedKmPerStep: 0.25
+      },
+      {
+        name: "Pelican Patrol",
+        lat: 27.8,
+        lon: -82.7,
+        heading: 300,     // NW
+        speedKmPerStep: 0.2
+      }
+    ];
+
+    // Rough conversion: ~111 km per degree latitude; adjust lon by cos(lat)
+    function moveShip(ship) {
+      const headingRad = (ship.heading * Math.PI) / 180;
+      const dKm = ship.speedKmPerStep;
+      const dLat = (dKm / 111.0) * Math.cos(headingRad);
+      const dLon = (dKm / (111.0 * Math.cos(ship.lat * Math.PI / 180))) * Math.sin(headingRad);
+
+      ship.lat += dLat;
+      ship.lon += dLon;
+
+      // If it leaves Tampa bounds, wrap it back near center
+      if (!tampaBounds.contains([ship.lat, ship.lon])) {
+        ship.lat = centerStPete[0];
+        ship.lon = centerStPete[1];
+      }
+    }
+
+    const demoShipMarkers = demoShips.map(function (ship) {
+      const icon = makeShipIcon(ship.heading);
+      const marker = L.marker([ship.lat, ship.lon], { icon: icon });
+      marker.bindPopup(
+        '<div class="nole-popup-label">' + ship.name + '</div>' +
+        '<div>Demo ship for practice</div>'
+      );
+      marker.addTo(demoShipsLayer);
+      return marker;
+    });
+
+    // Update positions every second
+    setInterval(function () {
+      demoShips.forEach(function (ship, index) {
+        moveShip(ship);
+        const marker = demoShipMarkers[index];
+        marker.setLatLng([ship.lat, ship.lon]);
+        marker.setIcon(makeShipIcon(ship.heading));
+      });
+    }, 1000);
+
+    // Add to layer control
+    L.control.layers(
+      null,
+      { "Demo Ships": demoShipsLayer },
+      { collapsed: true }
+    ).addTo(map);
+
     map.setMaxBounds(tampaBounds);
   </script>
 </body>
