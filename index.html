@@ -42,7 +42,9 @@
   ></script>
 
   <script>
+
     // Base map setup
+
     var centerStPete = [27.77, -82.64];
 
     var tampaBounds = L.latLngBounds(
@@ -66,13 +68,15 @@
 
     console.log("Leaflet version:", L.version);
 
-    // Point symbology helper
-    // beacon       -> #00FA00 small circle
-    // buoy         -> #0432FF small circle
-    // coastguard   -> #FF9300 large square
-    // fog signal   -> #FFFC00 medium circle
-    // offshore     -> #008F00 medium square
-    // wreck        -> #FF0000 medium X
+    // --------------------------------------------------------------------
+    //    Point symbology helper for ENC features
+    //    beacon       -> #00FA00 small circle
+    //    buoy         -> #0432FF small circle
+    //    coastguard   -> #FF9300 large square
+    //    fog signal   -> #FFFC00 medium circle
+    //    offshore     -> #008F00 medium square
+    //    wreck        -> #FF0000 medium X
+    // --------------------------------------------------------------------
     function makePointMarker(pointClass, latlng) {
       if (pointClass === "beacon") {
         return L.circleMarker(latlng, {
@@ -94,8 +98,7 @@
         return L.marker(latlng, {
           icon: L.divIcon({
             className: "",
-            html:
-              '<div style="width:16px;height:16px;background:#FF9300;"></div>',
+            html: '<div style="width:16px;height:16px;background:#FF9300;"></div>',
             iconSize: [16, 16],
             iconAnchor: [8, 8]
           })
@@ -112,8 +115,7 @@
         return L.marker(latlng, {
           icon: L.divIcon({
             className: "",
-            html:
-              '<div style="width:12px;height:12px;background:#008F00;"></div>',
+            html: '<div style="width:12px;height:12px;background:#008F00;"></div>',
             iconSize: [12, 12],
             iconAnchor: [6, 6]
           })
@@ -122,8 +124,7 @@
         return L.marker(latlng, {
           icon: L.divIcon({
             className: "",
-            html:
-              '<div style="color:#FF0000;font-size:16px;font-weight:bold;line-height:14px;">x</div>',
+            html: '<div style="color:#FF0000;font-size:16px;font-weight:bold;line-height:14px;">x</div>',
             iconSize: [16, 16],
             iconAnchor: [8, 7]
           })
@@ -140,7 +141,7 @@
       }
     }
 
-    // ENC layer configuration (labels for popups)
+    // ENC layer configuration (labels for kid-friendly popups)
     var encLayers = [
       // ---- Coastal ----
       {
@@ -328,8 +329,7 @@
         pointClass: "wreck"
       }
     ];
-
-    // Load each layer and attach popups
+    // Load ENC layers and attach kid-friendly popups
     encLayers.forEach(function (cfg) {
       fetch(cfg.file)
         .then(function (response) {
@@ -342,9 +342,9 @@
         .then(function (data) {
           console.log(
             cfg.name + " features:",
-            (data && data.features && data.features.length) ?
-              data.features.length :
-              "no features array"
+            (data && data.features && data.features.length)
+              ? data.features.length
+              : "no features array"
           );
 
           var layer = L.geoJSON(data, {
@@ -356,7 +356,6 @@
               return makePointMarker("default", latlng);
             },
             onEachFeature: function (feature, lyr) {
-              // Popup text: kid-friendly
               var text = cfg.label || cfg.name;
               var html = '<div class="nole-popup-label">' + text + '</div>';
               lyr.bindPopup(html);
@@ -371,8 +370,107 @@
         });
     });
 
+    // Global Fishing Watch via Cloudflare Worker proxy
+    const GFW_PROXY_URL = "https://nole-gfw-proxy.asw5230.workers.dev";
+
+    const gfwLayer = L.layerGroup().addTo(map);
+
+    function buildGfwUrl() {
+      // Tampa Bay bounding box: minLon,minLat,maxLon,maxLat
+      const minLon = -83.2;
+      const minLat = 26.9;
+      const maxLon = -81.9;
+      const maxLat = 28.6;
+
+      const params = [
+        "bbox=" + [minLon, minLat, maxLon, maxLat].join(","),
+        "limit=200"
+      ];
+
+      return GFW_PROXY_URL + "?" + params.join("&");
+    }
+
+    function makeShipArrowIcon(deg) {
+      const rotation = Number.isFinite(deg) ? deg : 0;
+      return L.divIcon({
+        className: "",
+        iconSize: [24, 24],
+        iconAnchor: [12, 12],
+        html:
+          '<div style="' +
+          'width:0;height:0;' +
+          'border-left:6px solid transparent;' +
+          'border-right:6px solid transparent;' +
+          'border-bottom:12px solid #00e0ff;' +
+          'transform:rotate(' + rotation + 'deg);' +
+          'transform-origin:center center;' +
+          '"></div>'
+      });
+    }
+
+    function fetchGfwVessels() {
+      const url = buildGfwUrl();
+      console.log("Fetching vessels via proxy:", url);
+
+      fetch(url)
+        .then(function (response) {
+          console.log("Proxy response status:", response.status);
+          if (!response.ok) {
+            throw new Error("Proxy HTTP " + response.status);
+          }
+          return response.json();
+        })
+        .then(function (data) {
+          if (!data || !Array.isArray(data.entries)) {
+            console.warn("GFW proxy: no entries array in response");
+            return;
+          }
+
+          gfwLayer.clearLayers();
+
+          data.entries.forEach(function (v) {
+            const lat = v.lat;
+            const lon = v.lon;
+            if (lat == null || lon == null) return;
+
+            const course = v.course || 0;
+            const name = v.shipname || v.name || "Vessel";
+            const speed = v.speed != null ? v.speed : null;
+            const flag = v.flag || "";
+
+            const icon = makeShipArrowIcon(course);
+
+            let popupHtml = '<div class="nole-popup-label">' + name + '</div>';
+            if (flag) popupHtml += '<div>Flag: ' + flag + '</div>';
+            if (speed !== null) popupHtml += '<div>Speed: ' + speed + ' kn</div>';
+            popupHtml += '<div>Heading: ' + course + '°</div>';
+
+            L.marker([lat, lon], { icon: icon })
+              .bindPopup(popupHtml)
+              .addTo(gfwLayer);
+          });
+
+          console.log("Vessels drawn:", data.entries.length);
+        })
+        .catch(function (err) {
+          console.error("Error fetching vessels via proxy:", err);
+        });
+    }
+
+    // Initial fetch + refresh every 60 seconds
+    fetchGfwVessels();
+    setInterval(fetchGfwVessels, 60000);
+
+    // Add a toggle in the layer control for the AIS layer
+    L.control.layers(
+      null,
+      { "Live Vessels (GFW)": gfwLayer },
+      { collapsed: true }
+    ).addTo(map);
+
     // Re-assert bounds
     map.setMaxBounds(tampaBounds);
   </script>
 </body>
 </html>
+
