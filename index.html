@@ -376,13 +376,20 @@
 
     const gfwLayer = L.layerGroup().addTo(map);
 
-    function buildGfwUrl() {
-      // TODO: make this match the query you tested in the GFW UI.
-      // For now, we keep bbox + limit; your Worker will forward these.
-      const minLon = -83.2;
-      const minLat = 26.9;
-      const maxLon = -81.9;
-      const maxLat = 28.6;
+function buildGfwUrl() {
+  // TEMP: bounding box around sample fishing event off Argentina
+  const minLon = -62.8;
+  const minLat = -47.2;
+  const maxLon = -62.7;
+  const maxLat = -47.1;
+
+  const params = [
+    "bbox=" + [minLon, minLat, maxLon, maxLat].join(","),
+    "limit=50"
+  ];
+
+  return GFW_PROXY_URL + "?" + params.join("&");
+}
 
       const params = [
         "bbox=" + [minLon, minLat, maxLon, maxLat].join(","),
