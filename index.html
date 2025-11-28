@@ -42,12 +42,12 @@
   ></script>
 
   <script>
-    // --------------------------------------------------------------------
-    // 1. Base map setup
-    // --------------------------------------------------------------------
+
+    // Base map setup
+
     var centerStPete = [27.77, -82.64];
 
-    // Tampa Bay bounding box — these are the canonical values
+    // Tampa Bay bounding box — canonical values
     var tampaBounds = L.latLngBounds(
       [26.9, -83.2],   // SW (lat, lon)
       [28.6, -81.9]    // NE (lat, lon)
@@ -69,15 +69,14 @@
 
     console.log("Leaflet version:", L.version);
 
-    // --------------------------------------------------------------------
-    // 2. Point symbology helper for ENC features
+    //    Point symbology helper for ENC features
     //    beacon       -> #00FA00 small circle
     //    buoy         -> #0432FF small circle
     //    coastguard   -> #FF9300 large square
     //    fog signal   -> #FFFC00 medium circle
     //    offshore     -> #008F00 medium square
     //    wreck        -> #FF0000 medium X
-    // --------------------------------------------------------------------
+    
     function makePointMarker(pointClass, latlng) {
       if (pointClass === "beacon") {
         return L.circleMarker(latlng, {
@@ -142,9 +141,8 @@
       }
     }
 
-    // --------------------------------------------------------------------
-    // 3. ENC layer configuration (labels for kid-friendly popups)
-    // --------------------------------------------------------------------
+    // ENC layer configuration (labels for kid-friendly popups)
+
     var encLayers = [
       // ---- Coastal ----
       {
@@ -333,9 +331,8 @@
       }
     ];
 
-    // --------------------------------------------------------------------
-    // 4. Load ENC layers and attach kid-friendly popups
-    // --------------------------------------------------------------------
+    // Load ENC layers and attach kid-friendly popups
+ 
     encLayers.forEach(function (cfg) {
       fetch(cfg.file)
         .then(function (response) {
@@ -376,186 +373,133 @@
         });
     });
 
-    // --------------------------------------------------------------------
-    // 5. Global Fishing Watch via Cloudflare Worker proxy (real ships)
-    // --------------------------------------------------------------------
-    const GFW_PROXY_URL = "https://nole-gfw-proxy.asw5230.workers.dev";
 
-    const gfwLayer = L.layerGroup().addTo(map);
+    // Global Fishing Watch via Cloudflare Worker (Port Visits)
+    const PORT_PROXY_URL = "https://nole-gfw-proxy.asw5230.workers.dev";
 
-    function makeShipIcon(deg) {
-      const rotation = Number.isFinite(deg) ? deg : 0;
-      return L.divIcon({
-        className: "",
-        iconSize: [24, 24],
-        iconAnchor: [12, 12],
-        html:
-          '<div style="' +
-          'width:0;height:0;' +
-          'border-left:6px solid transparent;' +
-          'border-right:6px solid transparent;' +
-          'border-bottom:14px solid #00e0ff;' +
-          'transform:rotate(' + rotation + 'deg);' +
-          'transform-origin:center center;' +
-          '"></div>'
+    // Layer to hold port visit markers
+    const portVisitsLayer = L.layerGroup().addTo(map);
+
+    // Build the bbox string for the Worker
+    function buildPortVisitsUrl() {
+      // Tampa Bay bounds in [minLon, minLat, maxLon, maxLat]
+      const minLat = 26.9;
+      const maxLat = 28.6;
+      const minLon = -83.2;
+      const maxLon = -81.9;
+
+      const bbox = [minLon, minLat, maxLon, maxLat].join(",");
+      console.log("Port visits bbox string:", bbox);
+
+      const params = [
+        "bbox=" + encodeURIComponent(bbox),
+        "limit=100"
+      ];
+
+      return PORT_PROXY_URL + "?" + params.join("&");
+    }
+
+    function makePortVisitMarker(lat, lon) {
+      // Simple purple-ish circle for port visits
+      return L.circleMarker([lat, lon], {
+        radius: 7,
+        color: "#a000ff",
+        weight: 2,
+        fillColor: "#d080ff",
+        fillOpacity: 0.9
       });
     }
 
-   function buildGfwUrl() {
-  // Tampa Bay bounds
-  const minLat = 26.9;
-  const maxLat = 28.6;
-  const minLon = -83.2;
-  const maxLon = -81.9;
+    function formatDateTime(iso) {
+      if (!iso) return "";
+      // Basic trimming, no heavy formatting
+      return iso.replace("T", " ").replace("Z", " UTC");
+    }
 
-  // GFW requires bbox=minLon,minLat,maxLon,maxLat
-  const bbox = [minLon, minLat, maxLon, maxLat].join(",");
-
-  console.log("GFW bbox string:", bbox); // <--- should log "-83.2,26.9,-81.9,28.6"
-
-  const params = [
-    "bbox=" + bbox,
-    "limit=200"
-  ];
-
-  return GFW_PROXY_URL + "?" + params.join("&");
-}
-    function fetchGfwVessels() {
-      const url = buildGfwUrl();
-      console.log("Fetching vessels via GFW proxy:", url);
+    function fetchPortVisits() {
+      const url = buildPortVisitsUrl();
+      console.log("Fetching port visits via proxy:", url);
 
       fetch(url)
         .then(function (response) {
-          console.log("GFW proxy response status:", response.status);
+          console.log("Port visits proxy response status:", response.status);
           if (!response.ok) {
             throw new Error("Proxy HTTP " + response.status);
           }
           return response.json();
         })
         .then(function (data) {
-          console.log("Raw GFW proxy JSON:", data);
+          console.log("Raw port visits JSON:", data);
 
-          let vessels = [];
-
-          // Case 1: entries with position.lat / position.lon
-          if (Array.isArray(data.entries)) {
-            vessels = data.entries.map(function (e) {
-              if (e.position && e.position.lat != null && e.position.lon != null) {
-                return {
-                  lat: e.position.lat,
-                  lon: e.position.lon,
-                  name: e.vessel && e.vessel.name ? e.vessel.name : (e.name || "Vessel"),
-                  speed: e.fishing && e.fishing.averageSpeedKnots != null
-                    ? e.fishing.averageSpeedKnots
-                    : e.speed,
-                  heading: e.course || e.heading || 0,
-                  raw: e
-                };
-              } else if (e.lat != null && e.lon != null) {
-                // entries[] with lat/lon directly
-                return {
-                  lat: e.lat,
-                  lon: e.lon,
-                  name: e.name || e.shipname || "Vessel",
-                  speed: e.speed,
-                  heading: e.course || e.heading || 0,
-                  raw: e
-                };
-              }
-              return null;
-            }).filter(function (v) { return v !== null; });
-
-            console.log("Parsed vessels from data.entries:", vessels.length);
-          }
-          // Case 2: data.data[] style
-          else if (Array.isArray(data.data)) {
-            vessels = data.data.map(function (e) {
-              if (e.lat != null && e.lon != null) {
-                return {
-                  lat: e.lat,
-                  lon: e.lon,
-                  name: e.name || e.shipname || "Vessel",
-                  speed: e.speed,
-                  heading: e.course || e.heading || 0,
-                  raw: e
-                };
-              }
-              return null;
-            }).filter(function (v) { return v !== null; });
-
-            console.log("Parsed vessels from data.data:", vessels.length);
-          }
-          // Case 3: GeoJSON FeatureCollection
-          else if (Array.isArray(data.features)) {
-            vessels = data.features.map(function (f) {
-              if (
-                f &&
-                f.geometry &&
-                f.geometry.type === "Point" &&
-                Array.isArray(f.geometry.coordinates)
-              ) {
-                const coords = f.geometry.coordinates; // [lon, lat]
-                const lon = coords[0];
-                const lat = coords[1];
-                const props = f.properties || {};
-                return {
-                  lat: lat,
-                  lon: lon,
-                  name: props.name || props.shipname || "Vessel",
-                  speed: props.speed,
-                  heading: props.course || props.heading || 0,
-                  raw: f
-                };
-              }
-              return null;
-            }).filter(function (v) { return v !== null; });
-
-            console.log("Parsed vessels from GeoJSON features:", vessels.length);
-          } else {
-            console.warn("GFW proxy: unrecognized JSON structure.");
+          if (!data || !Array.isArray(data.entries)) {
+            console.warn("Port visits: no entries array in response");
+            return;
           }
 
-          gfwLayer.clearLayers();
+          portVisitsLayer.clearLayers();
 
-          vessels.forEach(function (v) {
-            if (v.lat == null || v.lon == null) return;
+          data.entries.forEach(function (e) {
+            // Expecting e.position.lat / e.position.lon / e.vessel / e.port_visit
+            if (!e.position || e.position.lat == null || e.position.lon == null) return;
 
-            const icon = makeShipIcon(v.heading);
+            const lat = e.position.lat;
+            const lon = e.position.lon;
 
-            let popupHtml = '<div class="nole-popup-label">' + v.name + '</div>';
-            if (v.speed != null) {
-              popupHtml += '<div>Speed: ' + v.speed + ' kn</div>';
-            }
-            if (v.heading != null) {
-              popupHtml += '<div>Heading: ' + v.heading + '°</div>';
+            const vesselName =
+              (e.vessel && e.vessel.name) ||
+              (e.vessel && e.vessel.ssvid) ||
+              "Vessel";
+
+            const portInfo = e.port_visit || {};
+            const startAnch = portInfo.startAnchorage || {};
+            const endAnch = portInfo.endAnchorage || {};
+            const portName =
+              startAnch.name ||
+              endAnch.name ||
+              (startAnch.topDestination || endAnch.topDestination) ||
+              "Port";
+
+            const startTime = e.start ? formatDateTime(e.start) : "";
+            const endTime = e.end ? formatDateTime(e.end) : "";
+
+            let popupHtml =
+              '<div class="nole-popup-label">' + vesselName + '</div>' +
+              '<div>Port: ' + portName + '</div>';
+
+            if (startTime || endTime) {
+              popupHtml += '<div>Visit:';
+              if (startTime) popupHtml += '<br>From: ' + startTime;
+              if (endTime) popupHtml += '<br>To: ' + endTime;
+              popupHtml += '</div>';
             }
 
-            L.marker([v.lat, v.lon], { icon: icon })
-              .bindPopup(popupHtml)
-              .addTo(gfwLayer);
+            const marker = makePortVisitMarker(lat, lon);
+            marker.bindPopup(popupHtml).addTo(portVisitsLayer);
           });
 
-          console.log("Vessels drawn on map:", vessels.length);
+          console.log("Port visit markers drawn:", portVisitsLayer.getLayers().length);
         })
         .catch(function (err) {
-          console.error("Error fetching vessels via proxy:", err);
+          console.error("Error fetching port visits via proxy:", err);
         });
     }
 
-    // Initial fetch + refresh every 60 seconds
-    fetchGfwVessels();
-    setInterval(fetchGfwVessels, 60000);
+    // Initial fetch + refresh every 60 seconds (can be relaxed later)
+    fetchPortVisits();
+    setInterval(fetchPortVisits, 60000);
 
-    // Layer control (only for ships – ENC is always on)
+    // Layer control (ENC always on, Port Visits togglable)
+
     L.control.layers(
       null,
-      { "Live Vessels (GFW)": gfwLayer },
+      {
+        "Port Visits (GFW)": portVisitsLayer
+      },
       { collapsed: true }
     ).addTo(map);
 
-    // --------------------------------------------------------------------
-    // 6. Re-assert bounds
-    // --------------------------------------------------------------------
+    // Re-assert bounds
+
     map.setMaxBounds(tampaBounds);
   </script>
 </body>
