@@ -402,21 +402,22 @@
     }
 
     function buildGfwUrl() {
-      // IMPORTANT:
-      // GFW must receive bbox in the SAME ORDER you use in the API explorer.
-      // Here we send [minLat, minLon, maxLat, maxLon] to avoid lon/lat swap.
+      // GFW requires bbox=minLon,minLat,maxLon,maxLat
       const minLat = 26.9;
-      const minLon = -83.2;
       const maxLat = 28.6;
+      const minLon = -83.2;
       const maxLon = -81.9;
 
+      const bbox = [minLon, minLat, maxLon, maxLat].join(",");
+
       const params = [
-        "bbox=" + [minLat, minLon, maxLat, maxLon].join(","),  // lat,lon,lat,lon
+        "bbox=" + bbox,
         "limit=200"
       ];
 
       return GFW_PROXY_URL + "?" + params.join("&");
     }
+
 
     function fetchGfwVessels() {
       const url = buildGfwUrl();
