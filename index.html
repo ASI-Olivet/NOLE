@@ -54,215 +54,208 @@
     map.getPane("top-vessels").style.zIndex = 10000;
 
     // Ship Marker  
-
     function makePortVisitMarker(lat, lon) {
       return L.circleMarker([lat, lon], {
-        radius: 12,            
-        color: "#680093",      
-        weight: 3,             
-        fillColor: "#D5FC79",  
+        radius: 12,
+        color: "#680093",      // outline
+        weight: 3,
+        fillColor: "#D5FC79",  // fill
         fillOpacity: 1.0,
-        pane: "top-vessels"
-      });
-      });
-
-      return L.marker([lat, lon], {
-        icon: icon,
         pane: "top-vessels"
       });
     }
 
     // ENC GeoJSON layers
-const encLayers = [
-  // ---- Coastal ----
-  {
-    name: "Coastal Bridges",
-    file: "Coastal_Bridge_area_4326_clipTB.geojson",
-    label: "Bridge",
-    style: {
-      color: "#ff00ff",
-      weight: 2,
-      fillColor: "#ff00ff",
-      fillOpacity: 0.3
-    }
-  },
-  {
-    name: "Coastal Buoy Lateral",
-    file: "Coastal_Buoy_Lateral_point_4326_clipTB.geojson",
-    label: "Buoy",
-    pointClass: "buoy"
-  },
-  {
-    name: "Coastal Buoy Safe Water",
-    file: "Coastal_Buoy_Safe_Water_point_4326_clipTB.geojson",
-    label: "Buoy",
-    pointClass: "buoy"
-  },
-  {
-    name: "Coastal Fairway (clipped)",
-    file: "Coastal_Fairway_area_4326_clipTB.geojson",
-    label: "Ship Fairway",
-    style: {
-      color: "#00ff00",
-      weight: 2,
-      fillColor: "#00ff00",
-      fillOpacity: 0.2
-    }
-  },
-  {
-    name: "Coastal Radar Transponder Beacons",
-    file: "Coastal_Radar_Transponder_Beacon_point_4326_clipTB.geojson",
-    label: "Beacon",
-    pointClass: "beacon"  
-  },
-  {
-    name: "Coastal Wrecks",
-    file: "Coastal_Wreck_point_4326_clipTB.geojson",
-    label: "Wreck",
-    pointClass: "wreck"
-  },
+    const encLayers = [
+      // ---- Coastal ----
+      {
+        name: "Coastal Bridges",
+        file: "Coastal_Bridge_area_4326_clipTB.geojson",
+        label: "Bridge",
+        style: {
+          color: "#ff00ff",
+          weight: 2,
+          fillColor: "#ff00ff",
+          fillOpacity: 0.3
+        }
+      },
+      {
+        name: "Coastal Buoy Lateral",
+        file: "Coastal_Buoy_Lateral_point_4326_clipTB.geojson",
+        label: "Buoy",
+        pointClass: "buoy"
+      },
+      {
+        name: "Coastal Buoy Safe Water",
+        file: "Coastal_Buoy_Safe_Water_point_4326_clipTB.geojson",
+        label: "Buoy",
+        pointClass: "buoy"
+      },
+      {
+        name: "Coastal Fairway (clipped)",
+        file: "Coastal_Fairway_area_4326_clipTB.geojson",
+        label: "Ship Fairway",
+        style: {
+          color: "#00ff00",
+          weight: 2,
+          fillColor: "#00ff00",
+          fillOpacity: 0.2
+        }
+      },
+      {
+        name: "Coastal Radar Transponder Beacons",
+        file: "Coastal_Radar_Transponder_Beacon_point_4326_clipTB.geojson",
+        label: "Beacon",
+        pointClass: "beacon"
+      },
+      {
+        name: "Coastal Wrecks",
+        file: "Coastal_Wreck_point_4326_clipTB.geojson",
+        label: "Wreck",
+        pointClass: "wreck"
+      },
 
-  // ---- General ----
-  {
-    name: "General Buoy Special Purpose",
-    file: "General_Buoy_Special_Purpose_General_point_4326_clipTB.geojson",
-    label: "Buoy",
-    pointClass: "buoy"
-  },
-  {
-    name: "General Obstructions",
-    file: "General_Obstruction_area_4326_clipTB.geojson",
-    label: "Obstruction",
-    style: {
-      color: "#ff6600",
-      weight: 2,
-      fillColor: "#ff6600",
-      fillOpacity: 0.25
-    }
-  },
+      // ---- General ----
+      {
+        name: "General Buoy Special Purpose",
+        file: "General_Buoy_Special_Purpose_General_point_4326_clipTB.geojson",
+        label: "Buoy",
+        pointClass: "buoy"
+      },
+      {
+        name: "General Obstructions",
+        file: "General_Obstruction_area_4326_clipTB.geojson",
+        label: "Obstruction",
+        style: {
+          color: "#ff6600",
+          weight: 2,
+          fillColor: "#ff6600",
+          fillOpacity: 0.25
+        }
+      },
 
-  // ---- Harbour (first batch) ----
-  {
-    name: "Harbour Buoy Special Purpose",
-    file: "Harbour_Buoy_Special_Purpose_General_point_4326_clipTB.geojson",
-    label: "Buoy",
-    pointClass: "buoy"
-  },
-  {
-    name: "Harbour Submarine Cables",
-    file: "Harbour_Cable_Submarine_line_4326_clipTB.geojson",
-    label: "Subsea Cable",
-    style: {
-      color: "#00ffff",
-      weight: 2
-    }
-  },
-  {
-    name: "Harbour Coastguard Stations",
-    file: "Harbour_Coastguard_Station_point_4326_clipTB.geojson",
-    label: "Military",
-    pointClass: "coastguard"
-  },
-  {
-    name: "Harbour Coastline",
-    file: "Harbour_Coastline_line_4326_clipTB.geojson",
-    label: "Coastline",
-    style: {
-      color: "#ffffff",
-      weight: 1
-    }
-  },
-  {
-    name: "Harbour Fairways",
-    file: "Harbour_Fairway_area_4326_clipTB.geojson",
-    label: "Ship Fairway",
-    style: {
-      color: "#0000ff",
-      weight: 2,
-      fillColor: "#0000ff",
-      fillOpacity: 0.25
-    }
-  },
-  {
-    name: "Harbour Fog Signals",
-    file: "Harbour_Fog_Signal_point_4326_clipTB.geojson",
-    label: "Fog Signal",
-    pointClass: "fog-signal"
-  },
-  {
-    name: "Harbour Marine Farms",
-    file: "Harbour_Marine_Farm_Culture_area_4326_clipTB.geojson",
-    label: "Aqua Farm",
-    style: {
-      color: "#00ff88",
-      weight: 2,
-      fillColor: "#00ff88",
-      fillOpacity: 0.3
-    }
-  },
-  {
-    name: "Harbour Military Practice Areas",
-    file: "Harbour_Military_Practice_Area_4326_clipTB.geojson",
-    label: "Military",
-    style: {
-      color: "#ff0000",
-      weight: 2,
-      fillColor: "#ff0000",
-      fillOpacity: 0.2
-    }
-  },
+      // ---- Harbour (first batch) ----
+      {
+        name: "Harbour Buoy Special Purpose",
+        file: "Harbour_Buoy_Special_Purpose_General_point_4326_clipTB.geojson",
+        label: "Buoy",
+        pointClass: "buoy"
+      },
+      {
+        name: "Harbour Submarine Cables",
+        file: "Harbour_Cable_Submarine_line_4326_clipTB.geojson",
+        label: "Subsea Cable",
+        style: {
+          color: "#00ffff",
+          weight: 2
+        }
+      },
+      {
+        name: "Harbour Coastguard Stations",
+        file: "Harbour_Coastguard_Station_point_4326_clipTB.geojson",
+        label: "Military",
+        pointClass: "coastguard"
+      },
+      {
+        name: "Harbour Coastline",
+        file: "Harbour_Coastline_line_4326_clipTB.geojson",
+        label: "Coastline",
+        style: {
+          color: "#ffffff",
+          weight: 1
+        }
+      },
+      {
+        name: "Harbour Fairways",
+        file: "Harbour_Fairway_area_4326_clipTB.geojson",
+        label: "Ship Fairway",
+        style: {
+          color: "#0000ff",
+          weight: 2,
+          fillColor: "#0000ff",
+          fillOpacity: 0.25
+        }
+      },
+      {
+        name: "Harbour Fog Signals",
+        file: "Harbour_Fog_Signal_point_4326_clipTB.geojson",
+        label: "Fog Signal",
+        pointClass: "fog-signal"
+      },
+      {
+        name: "Harbour Marine Farms",
+        file: "Harbour_Marine_Farm_Culture_area_4326_clipTB.geojson",
+        label: "Aqua Farm",
+        style: {
+          color: "#00ff88",
+          weight: 2,
+          fillColor: "#00ff88",
+          fillOpacity: 0.3
+        }
+      },
+      {
+        name: "Harbour Military Practice Areas",
+        file: "Harbour_Military_Practice_Area_4326_clipTB.geojson",
+        label: "Military",
+        style: {
+          color: "#ff0000",
+          weight: 2,
+          fillColor: "#ff0000",
+          fillOpacity: 0.2
+        }
+      },
 
-  // ---- Harbour (second batch) ----
-  {
-    name: "Harbour Navigation Lines",
-    file: "Harbour_Navigation_Line_4326_clipTB.geojson",
-    label: "Navigation Line",
-    style: {
-      color: "#00ffff",
-      weight: 2
-    }
-  },
-  {
-    name: "Harbour Obstructions",
-    file: "Harbour_Obstruction_area_4326_clipTB.geojson",
-    label: "Obstruction",
-    style: {
-      color: "#ff3300",
-      weight: 2,
-      fillColor: "#ff3300",
-      fillOpacity: 0.3
-    }
-  },
-  {
-    name: "Harbour Offshore Platforms",
-    file: "Harbour_Offshore_Platform_point_4326_clipTB.geojson",
-    label: "Offshore Platform",
-    pointClass: "offshore-platform"
-  },
-  {
-    name: "Harbour Radar Transponder Beacons",
-    file: "Harbour_Radar_Transponder_Beacon_point_4326_clipTB.geojson",
-    label: "Beacon",
-    pointClass: "beacon"
-  },
-  {
-    name: "Harbour Wrecks",
-    file: "Harbour_Wreck_point_4326_clipTB.geojson",
-    label: "Wreck",
-    pointClass: "wreck"
-  },
+      // ---- Harbour (second batch) ----
+      {
+        name: "Harbour Navigation Lines",
+        file: "Harbour_Navigation_Line_4326_clipTB.geojson",
+        label: "Navigation Line",
+        style: {
+          color: "#00ffff",
+          weight: 2
+        }
+      },
+      {
+        name: "Harbour Obstructions",
+        file: "Harbour_Obstruction_area_4326_clipTB.geojson",
+        label: "Obstruction",
+        style: {
+          color: "#ff3300",
+          weight: 2,
+          fillColor: "#ff3300",
+          fillOpacity: 0.3
+        }
+      },
+      {
+        name: "Harbour Offshore Platforms",
+        file: "Harbour_Offshore_Platform_point_4326_clipTB.geojson",
+        label: "Offshore Platform",
+        pointClass: "offshore-platform"
+      },
+      {
+        name: "Harbour Radar Transponder Beacons",
+        file: "Harbour_Radar_Transponder_Beacon_point_4326_clipTB.geojson",
+        label: "Beacon",
+        pointClass: "beacon"
+      },
+      {
+        name: "Harbour Wrecks",
+        file: "Harbour_Wreck_point_4326_clipTB.geojson",
+        label: "Wreck",
+        pointClass: "wreck"
+      },
 
-  // ---- Overview ----
-  {
-    name: "Overview Wrecks",
-    file: "Overview_Wreck_point_4326_clipTB.geojson",
-    label: "Wreck",
-    pointClass: "wreck"
-  }
-];
+      // ---- Overview ----
+      {
+        name: "Overview Wrecks",
+        file: "Overview_Wreck_point_4326_clipTB.geojson",
+        label: "Wreck",
+        pointClass: "wreck"
+      }
+    ];
 
     function makePointMarker(pointClass, latlng) {
-    
+
       if (pointClass === "buoy") {
         return L.circleMarker(latlng, {
           radius: 5,
@@ -423,4 +416,3 @@ const encLayers = [
   </script>
 </body>
 </html>
-
