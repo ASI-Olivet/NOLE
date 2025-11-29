@@ -1,85 +1,190 @@
-  <!-- (HTML): Minimal Leaflet map with Tampa Bay bounds -->
-  <!DOCTYPE html>
-  <html lang="en">
-  <head>
-    <!-- (CSS): Load Leaflet CSS map rendering -->
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>NOLE — Tampa Bay Map</title>
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-      crossorigin=""
-    />
-    <style>
-      /* (CSS): Full-viewport map container */
-      html, body, #map { height: 100%; margin: 0; }
-    </style>
-  </head>
-  <body>
-    <div id="map" aria-label="Tampa Bay Map"></div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>NOLE — Tampa Bay Map</title>
 
-    <!-- (JavaScript): Load Leaflet JS and configure map + bounds -->
-    <script
-      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-      crossorigin=""
-    ></script>
-    <script>
-      // Center St. Pete
-      const centerStPete = [27.770, -82.640];
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    crossorigin=""
+  />
 
-      // Bounding box: 
-      // North ~ Hudson:   28.36°N,  -82.69°W
-      // South ~ Venice:   27.10°N,  -82.45°W
-      // West buffer (Gulf):          -83.05°W
-      // East buffer (Tampa):  -82.10°W
-      const tampaBounds = L.latLngBounds(
-         [27.05, -83.05],   
-         [28.40, -82.10]    
-      );
+  <style>
+    html, body, #map {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
 
-      // Create map, lock bounds, set zoom limits
-      const map = L.map('map', {
-        minZoom: 9,
-        maxZoom: 18,
-        maxBounds: tampaBounds,
-        maxBoundsViscosity: 0.9 
-        // elastic edge when kids outside
-      }).setView(centerStPete, 11);
+    .nole-popup-label {
+      font-size: 14px;
+      font-weight: 600;
+    }
+  </style>
+</head>
 
-      // Base layer (OpenStreetMap)
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '© OpenStreetMap contributors'
-      }).addTo(map);
+<body>
+  <div id="map"></div>
 
-      //simple scale bar
-      L.control.scale({ metric: true, imperial: true }).addTo(map);
-      // Load ENC Harbour coastline layer (GeoJSON)
-      // --- Load one ENC Fairway area layer (test) ---
-      fetch("data/Coastal_Fairway_area_4326.geojson")
-        .then((response) => response.json())
-        .then((data) => {
-          console.log("ENC Fairway loaded, feature count:", data.features ? data.features.length : "no features field");
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 
-          const encTestLayer = L.geoJSON(data, {
-            style: {
-              color: "#00ff00",
-              weight: 2,
-              fillColor: "#00ff00",
-              fillOpacity: 0.4
+  <script>
+
+    // Base Map + Panes
+
+    const tampaBounds = L.latLngBounds(
+      [26.9, -83.2],  // SW
+      [28.6, -81.9]   // NE
+    );
+
+    const map = L.map("map", {
+      minZoom: 9,
+      maxZoom: 18,
+      maxBounds: tampaBounds,
+      maxBoundsViscosity: 0.9
+    }).setView([27.77, -82.64], 11);
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 19,
+      attribution: "© OpenStreetMap, Vessel data from Global Fishing Watch"
+    }).addTo(map);
+
+    // **** New pane ensures vessels appear on TOP ****
+    map.createPane("top-vessels");
+    map.getPane("top-vessels").style.zIndex = 10000;
+
+    // Green Ship Marker
+
+    function makePortVisitMarker(lat, lon) {
+      return L.circleMarker([lat, lon], {
+        radius: 10,
+        color: "#680093",
+        weight: 3,
+        fillColor: "#D5FC79",
+        fillOpacity: 1.0,
+        pane: "top-vessels"
+      });
+    }
+
+    // Load ENC GeoJSON (unchanged)
+
+    const encLayers = [
+      { name: "Coastal Wrecks", file: "Coastal_Wreck_point_4326_clipTB.geojson", label: "Wreck", pointClass: "wreck" },
+      { name: "Harbour Buoy", file: "Harbour_Buoy_Special_Purpose_General_point_4326_clipTB.geojson", label: "Buoy", pointClass: "buoy" },
+      { name: "Harbour Coastline", file: "Harbour_Coastline_line_4326_clipTB.geojson", label: "Coastline", style: { color: "#ffffff", weight: 1 } },
+      // (You can add the rest again later — trimmed for clarity)
+    ];
+
+    function makePointMarker(pointClass, latlng) {
+      const colors = {
+        buoy: "#0432FF",
+        beacon: "#00FA00",
+        wreck: "#FF0000",
+        "fog-signal": "#FFC000",
+        "offshore-platform": "#008F00",
+        coastguard: "#F48C03
+      };
+
+      const color = colors[pointClass] || "#ADADAD;
+
+      return L.circleMarker(latlng, {
+        radius: 4,
+        color: color,
+        weight: 1,
+        fillColor: color,
+        fillOpacity: 0.9
+      });
+    }
+
+    encLayers.forEach(cfg => {
+      fetch(cfg.file)
+        .then(r => r.json())
+        .then(data => {
+          L.geoJSON(data, {
+            style: cfg.style,
+            pointToLayer: (feature, latlng) =>
+              cfg.pointClass ? makePointMarker(cfg.pointClass, latlng) :
+              makePointMarker("default", latlng),
+            onEachFeature: (feature, layer) => {
+              layer.bindPopup(`<div class="nole-popup-label">${cfg.label}</div>`);
             }
           }).addTo(map);
-
-          const bounds = encTestLayer.getBounds();
-          console.log("ENC Fairway layer bounds:", bounds);
-
-          encTestLayer.bringToFront();
-          map.fitBounds(bounds);
         })
-    </script>
-  </body>
-  </html>
+        .catch(err => console.error("ENC load error:", cfg.name, err));
+    });
 
+    // Live GFW Port-Visit Vessels
+
+    const PROXY = "https://nole-gfw-proxy.asw5230.workers.dev";
+    const vesselsLayer = L.layerGroup().addTo(map);
+
+    function buildUrl() {
+      const minLat = 26.9;
+      const maxLat = 28.6;
+      const minLon = -83.2;
+      const maxLon = -81.9;
+
+      const bbox = [minLon, minLat, maxLon, maxLat].join(",");
+
+      console.log("Port visits bbox string:", bbox);
+
+      return `${PROXY}?bbox=${encodeURIComponent(bbox)}&limit=100`;
+    }
+
+    function fetchVessels() {
+      const url = buildUrl();
+      console.log("Fetching port visits via proxy:", url);
+
+      fetch(url)
+        .then(r => {
+          console.log("Port visits proxy response status:", r.status);
+          return r.json();
+        })
+        .then(data => {
+          console.log("Raw port visits JSON:", data);
+
+          vesselsLayer.clearLayers();
+
+          if (!Array.isArray(data.entries)) {
+            console.warn("No entries[] found in GFW response.");
+            return;
+          }
+
+          let count = 0;
+
+          data.entries.forEach(e => {
+            if (!e.position || e.position.lat == null || e.position.lon == null)
+              return;
+
+            const lat = e.position.lat;
+            const lon = e.position.lon;
+
+            const marker = makePortVisitMarker(lat, lon);
+
+            const name = e.vessel?.name || "Vessel";
+            const type = e.type || "port_visit";
+
+            marker.bindPopup(`
+              <div class="nole-popup-label">${name}</div>
+              <div>Event: ${type}</div>
+            `);
+
+            marker.addTo(vesselsLayer);
+            count++;
+          });
+
+          console.log("Port visit markers drawn:", count);
+        })
+        .catch(err => console.error("Port visit fetch error:", err));
+    }
+
+    // Initial load + refresh every 60 seconds
+    fetchVessels();
+    setInterval(fetchVessels, 60000);
+
+    L.control.layers(null, { "Live Port Visits": vesselsLayer }, { collapsed: true }).addTo(map);
+  </script>
+</body>
+</html>
