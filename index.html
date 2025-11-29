@@ -31,9 +31,8 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 
   <script>
-    // ============================================================
-    // 1. Base Map + Panes
-    // ============================================================
+
+    // Base Map + Panes
 
     const tampaBounds = L.latLngBounds(
       [26.9, -83.2],  // SW
@@ -56,10 +55,7 @@
     map.createPane("top-vessels");
     map.getPane("top-vessels").style.zIndex = 10000;
 
-
-    // ============================================================
-    // 2. Green Ship Marker
-    // ============================================================
+    // Green Ship Marker
 
     function makePortVisitMarker(lat, lon) {
       return L.circleMarker([lat, lon], {
@@ -72,10 +68,7 @@
       });
     }
 
-
-    // ============================================================
-    // 3. Load ENC GeoJSON (unchanged)
-    // ============================================================
+    // Load ENC GeoJSON (unchanged)
 
     const encLayers = [
       { name: "Coastal Wrecks", file: "Coastal_Wreck_point_4326_clipTB.geojson", label: "Wreck", pointClass: "wreck" },
@@ -89,12 +82,12 @@
         buoy: "#0432FF",
         beacon: "#00FA00",
         wreck: "#FF0000",
-        "fog-signal": "#D5FC79",
+        "fog-signal": "#FFC000",
         "offshore-platform": "#008F00",
-        coastguard: "#FF9300"
+        coastguard: "#F48C03
       };
 
-      const color = colors[pointClass] || "#ffffff";
+      const color = colors[pointClass] || "#ADADAD;
 
       return L.circleMarker(latlng, {
         radius: 4,
@@ -122,10 +115,7 @@
         .catch(err => console.error("ENC load error:", cfg.name, err));
     });
 
-
-    // ============================================================
-    // 4. Live GFW Port-Visit Vessels
-    // ============================================================
+    // Live GFW Port-Visit Vessels
 
     const PROXY = "https://nole-gfw-proxy.asw5230.workers.dev";
     const vesselsLayer = L.layerGroup().addTo(map);
