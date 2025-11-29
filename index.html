@@ -55,15 +55,28 @@
     map.createPane("top-vessels");
     map.getPane("top-vessels").style.zIndex = 10000;
 
-    // Ship Marker
+    // Ship Marker  (vessels = large triangle, outline 680093, fill D5FC79)
 
     function makePortVisitMarker(lat, lon) {
-      return L.circleMarker([lat, lon], {
-        radius: 10,
-        color: "#680093",
-        weight: 3,
-        fillColor: "#00ff55",
-        fillOpacity: 1.0,
+      const icon = L.divIcon({
+        className: "",
+        iconSize: [26, 26],
+        iconAnchor: [13, 13],
+        html:
+          '<div style="position:relative;width:0;height:0;">' +
+            '<div style="' +
+              'position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);' +
+              'width:0;height:0;' +
+              'border-left:10px solid transparent;' +
+              'border-right:10px solid transparent;' +
+              'border-bottom:18px solid #D5FC79;' +   /* fill color */ 
+              'box-shadow:0 0 0 3px #680093;' +       /* outline color */ 
+            '"></div>' +
+          '</div>'
+      });
+
+      return L.marker([lat, lon], {
+        icon: icon,
         pane: "top-vessels"
       });
     }
@@ -77,23 +90,84 @@
       // (You can add the rest again later — trimmed for clarity)
     ];
 
+    // ENC point symbology:
+    // Buoys        -> blue circle
+    // Wrecks       -> red X
+    // Military/CG  -> medium square FFC000
+    // Fog signal   -> medium square FFFF2C
+    // Offshore plat-> medium square D86DCD
+    // Default      -> gray circle ADADAD
+
     function makePointMarker(pointClass, latlng) {
-      const colors = {
-        buoy: "#0432FF",
-        beacon: "#00FA00",
-        wreck: "#FF0000",
-        "fog-signal": "#FFC000",
-        "offshore-platform": "#008F00",
-        coastguard: "#FF9300"
-      };
+      // Buoys: keep blue circle markers
+      if (pointClass === "buoy") {
+        return L.circleMarker(latlng, {
+          radius: 5,
+          color: "#0432FF",
+          weight: 1,
+          fillColor: "#0432FF",
+          fillOpacity: 0.9
+        });
+      }
 
-      const color = colors[pointClass] || "#ADADAD";
+      // Wrecks: red X (FF0000)
+      if (pointClass === "wreck") {
+        return L.marker(latlng, {
+          icon: L.divIcon({
+            className: "",
+            iconSize: [16, 16],
+            iconAnchor: [8, 8],
+            html:
+              '<div style="color:#FF0000;font-size:18px;font-weight:bold;line-height:16px;">×</div>'
+          })
+        });
+      }
 
+      // Military and coast guard: medium square FFC000
+      if (pointClass === "coastguard" || pointClass === "military") {
+        return L.marker(latlng, {
+          icon: L.divIcon({
+            className: "",
+            iconSize: [14, 14],
+            iconAnchor: [7, 7],
+            html:
+              '<div style="width:14px;height:14px;background:#FFC000;"></div>'
+          })
+        });
+      }
+
+      // Fog signal: medium square FFFF2C
+      if (pointClass === "fog-signal") {
+        return L.marker(latlng, {
+          icon: L.divIcon({
+            className: "",
+            iconSize: [14, 14],
+            iconAnchor: [7, 7],
+            html:
+              '<div style="width:14px;height:14px;background:#FFFF2C;"></div>'
+          })
+        });
+      }
+
+      // Offshore platform: medium square D86DCD
+      if (pointClass === "offshore-platform") {
+        return L.marker(latlng, {
+          icon: L.divIcon({
+            className: "",
+            iconSize: [14, 14],
+            iconAnchor: [7, 7],
+            html:
+              '<div style="width:14px;height:14px;background:#D86DCD;"></div>'
+          })
+        });
+      }
+
+      // Default "other": gray circle ADADAD
       return L.circleMarker(latlng, {
         radius: 5,
-        color: color,
+        color: "#ADADAD",
         weight: 1,
-        fillColor: color,
+        fillColor: "#ADADAD",
         fillOpacity: 0.9
       });
     }
@@ -105,10 +179,12 @@
           L.geoJSON(data, {
             style: cfg.style,
             pointToLayer: (feature, latlng) =>
-              cfg.pointClass ? makePointMarker(cfg.pointClass, latlng) :
-              makePointMarker("default", latlng),
+              cfg.pointClass ? makePointMarker(cfg.pointClass, latlng)
+                             : makePointMarker("default", latlng),
             onEachFeature: (feature, layer) => {
-              layer.bindPopup(`<div class="nole-popup-label">${cfg.label}</div>`);
+              layer.bindPopup(
+                `<div class="nole-popup-label">${cfg.label}</div>`
+              );
             }
           }).addTo(map);
         })
