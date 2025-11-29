@@ -53,7 +53,7 @@
     map.createPane("top-vessels");
     map.getPane("top-vessels").style.zIndex = 10000;
 
-    // Ship Marker  
+    // Ship Marker: vessels = large circle, outline 680093, fill D5FC79
     function makePortVisitMarker(lat, lon) {
       return L.circleMarker([lat, lon], {
         radius: 12,
@@ -254,8 +254,9 @@
       }
     ];
 
+    // ENC point symbology (buoys, wrecks, military, fog, offshore, default)
     function makePointMarker(pointClass, latlng) {
-
+      // Buoys: blue circle
       if (pointClass === "buoy") {
         return L.circleMarker(latlng, {
           radius: 5,
@@ -266,6 +267,7 @@
         });
       }
 
+      // Wrecks: red X
       if (pointClass === "wreck") {
         return L.marker(latlng, {
           icon: L.divIcon({
@@ -278,6 +280,7 @@
         });
       }
 
+      // Military and coast guard: medium square FFC000
       if (pointClass === "coastguard" || pointClass === "military") {
         return L.marker(latlng, {
           icon: L.divIcon({
@@ -290,6 +293,7 @@
         });
       }
 
+      // Fog signal: medium square FFFF2C
       if (pointClass === "fog-signal") {
         return L.marker(latlng, {
           icon: L.divIcon({
@@ -302,6 +306,7 @@
         });
       }
 
+      // Offshore platform: medium square D86DCD
       if (pointClass === "offshore-platform") {
         return L.marker(latlng, {
           icon: L.divIcon({
@@ -328,7 +333,11 @@
       fetch(cfg.file)
         .then(r => r.json())
         .then(data => {
-          console.log(cfg.name, "features:", data && data.features ? data.features.length : 0);
+          console.log(
+            cfg.name,
+            "features:",
+            data && data.features ? data.features.length : 0
+          );
 
           L.geoJSON(data, {
             style: cfg.style,
@@ -384,7 +393,8 @@
           let count = 0;
 
           data.entries.forEach(e => {
-            if (!e.position || e.position.lat == null || e.position.lon == null) return;
+            if (!e.position || e.position.lat == null || e.position.lon == null)
+              return;
 
             const lat = e.position.lat;
             const lon = e.position.lon;
