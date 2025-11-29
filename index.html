@@ -31,7 +31,6 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 
   <script>
-
     // Base Map + Panes
 
     const tampaBounds = L.latLngBounds(
@@ -81,13 +80,52 @@
       });
     }
 
-    // Load ENC GeoJSON (unchanged)
+    // Load ENC GeoJSON
 
     const encLayers = [
-      { name: "Coastal Wrecks", file: "Coastal_Wreck_point_4326_clipTB.geojson", label: "Wreck", pointClass: "wreck" },
-      { name: "Harbour Buoy", file: "Harbour_Buoy_Special_Purpose_General_point_4326_clipTB.geojson", label: "Buoy", pointClass: "buoy" },
-      { name: "Harbour Coastline", file: "Harbour_Coastline_line_4326_clipTB.geojson", label: "Coastline", style: { color: "#ffffff", weight: 1 } },
-      // (You can add the rest again later — trimmed for clarity)
+      {
+        name: "Coastal Wrecks",
+        file: "Coastal_Wreck_point_4326_clipTB.geojson",
+        label: "Wreck",
+        pointClass: "wreck"
+      },
+      {
+        name: "Harbour Buoy Special Purpose",
+        file: "Harbour_Buoy_Special_Purpose_General_point_4326_clipTB.geojson",
+        label: "Buoy",
+        pointClass: "buoy"
+      },
+      {
+        name: "Harbour Fog Signals",
+        file: "Harbour_Fog_Signal_point_4326_clipTB.geojson",
+        label: "Fog Signal",
+        pointClass: "fog-signal"
+      },
+      {
+        name: "Harbour Offshore Platforms",
+        file: "Harbour_Offshore_Platform_point_4326_clipTB.geojson",
+        label: "Offshore Platform",
+        pointClass: "offshore-platform"
+      },
+      {
+        name: "Harbour Coastguard Stations",
+        file: "Harbour_Coastguard_Station_point_4326_clipTB.geojson",
+        label: "Military",
+        pointClass: "coastguard"
+      },
+      {
+        name: "Harbour Military Practice Areas",
+        file: "Harbour_Military_Practice_Area_4326_clipTB.geojson",
+        label: "Military",
+        pointClass: "military"
+      },
+      {
+        name: "Harbour Coastline",
+        file: "Harbour_Coastline_line_4326_clipTB.geojson",
+        label: "Coastline",
+        style: { color: "#ffffff", weight: 1 }
+      }
+      // You can add your other ENC layers here with appropriate pointClass / style
     ];
 
     // ENC point symbology:
@@ -99,7 +137,7 @@
     // Default      -> gray circle ADADAD
 
     function makePointMarker(pointClass, latlng) {
-      // Buoys: keep blue circle markers
+      // Buoys: blue circle markers
       if (pointClass === "buoy") {
         return L.circleMarker(latlng, {
           radius: 5,
@@ -183,7 +221,7 @@
                              : makePointMarker("default", latlng),
             onEachFeature: (feature, layer) => {
               layer.bindPopup(
-                `<div class="nole-popup-label">${cfg.label}</div>`
+                '<div class="nole-popup-label">' + cfg.label + '</div>'
               );
             }
           }).addTo(map);
@@ -206,7 +244,7 @@
 
       console.log("Port visits bbox string:", bbox);
 
-      return `${PROXY}?bbox=${encodeURIComponent(bbox)}&limit=100`;
+      return PROXY + "?bbox=" + encodeURIComponent(bbox) + "&limit=100";
     }
 
     function fetchVessels() {
@@ -239,13 +277,13 @@
 
             const marker = makePortVisitMarker(lat, lon);
 
-            const name = e.vessel?.name || "Vessel";
+            const name = (e.vessel && e.vessel.name) || "Vessel";
             const type = e.type || "port_visit";
 
-            marker.bindPopup(`
-              <div class="nole-popup-label">${name}</div>
-              <div>Event: ${type}</div>
-            `);
+            marker.bindPopup(
+              '<div class="nole-popup-label">' + name + '</div>' +
+              '<div>Event: ' + type + '</div>'
+            );
 
             marker.addTo(vesselsLayer);
             count++;
