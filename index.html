@@ -87,7 +87,7 @@
         coastguard: "#F48C03
       };
 
-      const color = colors[pointClass] || "#ADADAD;
+      const color = colors[pointClass] || "#ADADAD";
 
       return L.circleMarker(latlng, {
         radius: 4,
@@ -168,8 +168,9 @@
 
             marker.bindPopup(`
               <div class="nole-popup-label">${name}</div>
-              <div>Event: ${type}</div>
-            `);
+              <div>flag: ${flag}</div>
+              <div>id: ${id}</div>
+              `);
 
             marker.addTo(vesselsLayer);
             count++;
