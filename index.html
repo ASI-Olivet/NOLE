@@ -59,29 +59,14 @@
     // Ship Marker  (vessels = large triangle, outline 680093, fill D5FC79)
     // --------------------------------------------------------------------
     function makePortVisitMarker(lat, lon) {
-      const icon = L.divIcon({
-        className: "",
-        iconSize: [26, 26],
-        iconAnchor: [13, 13],
-        html:
-          '<div style="position:relative;width:0;height:0;">' +
-            // Outer purple triangle (outline)
-            '<div style="' +
-              'position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);' +
-              'width:0;height:0;' +
-              'border-left:12px solid transparent;' +
-              'border-right:12px solid transparent;' +
-              'border-bottom:22px solid #680093;' +
-            '"></div>' +
-            // Inner green triangle (fill)
-            '<div style="' +
-              'position:absolute;left:50%;top:48%;transform:translate(-50%,-50%);' +
-              'width:0;height:0;' +
-              'border-left:9px solid transparent;' +
-              'border-right:9px solid transparent;' +
-              'border-bottom:17px solid #D5FC79;' +
-            '"></div>' +
-          '</div>'
+      return L.circleMarker([lat, lon], {
+        radius: 12,            // large circle
+        color: "#680093",      // outline
+        weight: 3,             // outline thickness
+        fillColor: "#D5FC79",  // vessel fill color
+        fillOpacity: 1.0,
+        pane: "top-vessels"
+      });
       });
 
       return L.marker([lat, lon], {
