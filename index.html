@@ -31,7 +31,7 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 
   <script>
-    // Base Map + Panes
+    // Basemap - pane view
     const tampaBounds = L.latLngBounds(
       [26.9, -83.2],  // SW
       [28.6, -81.9]   // NE
@@ -49,17 +49,17 @@
       attribution: "© OpenStreetMap, Vessel data from Global Fishing Watch."
     }).addTo(map);
 
-    // pane so vessels stay on TOP
+    // Vessels on TOP
     map.createPane("top-vessels");
     map.getPane("top-vessels").style.zIndex = 10000;
 
-    // Ship Marker: vessels = large circle, outline 680093, fill D5FC79
+    // Ship Marker: vessels 
     function makePortVisitMarker(lat, lon) {
       return L.circleMarker([lat, lon], {
         radius: 12,
-        color: "#680093",      // outline
+        color: "#680093",      
         weight: 3,
-        fillColor: "#D5FC79",  // fill
+        fillColor: "#D5FC79",  
         fillOpacity: 1.0,
         pane: "top-vessels"
       });
@@ -67,7 +67,7 @@
 
     // ENC GeoJSON layers
     const encLayers = [
-      // ---- Coastal ----
+      // Coastal 
       {
         name: "Coastal Bridges",
         file: "Coastal_Bridge_area_4326_clipTB.geojson",
@@ -115,7 +115,7 @@
         pointClass: "wreck"
       },
 
-      // ---- General ----
+      // General 
       {
         name: "General Buoy Special Purpose",
         file: "General_Buoy_Special_Purpose_General_point_4326_clipTB.geojson",
@@ -134,7 +134,7 @@
         }
       },
 
-      // ---- Harbour (first batch) ----
+      //  Harbour 1
       {
         name: "Harbour Buoy Special Purpose",
         file: "Harbour_Buoy_Special_Purpose_General_point_4326_clipTB.geojson",
@@ -205,7 +205,7 @@
         }
       },
 
-      // ---- Harbour (second batch) ----
+      // Harbour 2
       {
         name: "Harbour Navigation Lines",
         file: "Harbour_Navigation_Line_4326_clipTB.geojson",
@@ -245,7 +245,6 @@
         pointClass: "wreck"
       },
 
-      // ---- Overview ----
       {
         name: "Overview Wrecks",
         file: "Overview_Wreck_point_4326_clipTB.geojson",
@@ -256,7 +255,7 @@
 
     // ENC point symbology (buoys, wrecks, military, fog, offshore, default)
     function makePointMarker(pointClass, latlng) {
-      // Buoys: blue circle
+      // Buoys
       if (pointClass === "buoy") {
         return L.circleMarker(latlng, {
           radius: 5,
@@ -293,7 +292,7 @@
         });
       }
 
-      // Fog signal: medium square FFFF2C
+      // Fog signal
       if (pointClass === "fog-signal") {
         return L.marker(latlng, {
           icon: L.divIcon({
@@ -306,7 +305,7 @@
         });
       }
 
-      // Offshore platform: medium square D86DCD
+      // Offshore platform
       if (pointClass === "offshore-platform") {
         return L.marker(latlng, {
           icon: L.divIcon({
@@ -319,7 +318,7 @@
         });
       }
 
-      // Default "other": gray circle ADADAD
+      // Default "other"
       return L.circleMarker(latlng, {
         radius: 5,
         color: "#ADADAD",
