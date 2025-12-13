@@ -37,21 +37,29 @@
       [28.6, -81.9]   // NE
     );
 
-    const map = L.map("map", {
-      minZoom: 9,
-      maxZoom: 18,
-      maxBounds: tampaBounds,
-      maxBoundsViscosity: 0.9
-    }).setView([27.77, -82.64], 11);
+     // Draw order for pop-up
+     const map = L.map("map", {
+       minZoom: 9,
+       maxZoom: 18,
+       maxBounds: tampaBounds,
+       maxBoundsViscosity: 0.9
+     }).setView([27.77, -82.64], 11);
+    
+     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+       maxZoom: 18,
+       attribution: "© OpenStreetMap contributors, Vessel data from Global Fishing Watch."
+     }).addTo(map);
 
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      maxZoom: 18,
-      attribution: "© OpenStreetMap, Vessel data from Global Fishing Watch."
-    }).addTo(map);
+     // Vessels on TOP of ENC layers
+     map.createPane("top-vessels");
+     map.getPane("top-vessels").style.zIndex = 10000;
 
-    // Vessels on TOP
-    map.createPane("top-vessels");
-    map.getPane("top-vessels").style.zIndex = 10000;
+     // Popups on TOP of vessels (only when a popup is open)
+     map.getPane("popupPane").style.zIndex = 20000;
+
+     // Vessels on TOP
+     map.createPane("top-vessels");
+     map.getPane("top-vessels").style.zIndex = 10000;
 
     // Ship Marker: vessels 
     function makePortVisitMarker(lat, lon) {
