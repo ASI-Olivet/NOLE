@@ -181,440 +181,448 @@
 
   <div id="map"></div>
 
-  <script
-    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-    crossorigin=""
-  ></script>
+<script
+  src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  crossorigin=""
+></script>
 
-  <script>
-    // Basemap - pane view
-    const tampaBounds = L.latLngBounds(
-      [26.9, -83.2], // SW
-      [28.6, -81.9]  // NE
-    );
+<script>
+  // Basemap - pane view
+  const tampaBounds = L.latLngBounds(
+    [26.9, -83.2], // SW
+    [28.6, -81.9]  // NE
+  );
 
-    // Draw order for pop-up
-    const map = L.map("map", {
-      minZoom: 9,
-      maxZoom: 18,
-      maxBounds: tampaBounds,
-      maxBoundsViscosity: 0.9
-    }).setView([27.77, -82.64], 11);
+  // Draw order for pop-up
+  const map = L.map("map", {
+    minZoom: 9,
+    maxZoom: 18,
+    maxBounds: tampaBounds,
+    maxBoundsViscosity: 0.9
+  }).setView([27.77, -82.64], 11);
 
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      maxZoom: 18,
-      attribution: "© OpenStreetMap contributors, Vessel data from Global Fishing Watch."
-    }).addTo(map);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 18,
+    attribution: "© OpenStreetMap contributors, Vessel data from Global Fishing Watch."
+  }).addTo(map);
 
-    // Vessels on TOP of ENC layers
-    map.createPane("top-vessels");
-    map.getPane("top-vessels").style.zIndex = 10000;
+  // Vessels on TOP of ENC layers
+  map.createPane("top-vessels");
+  map.getPane("top-vessels").style.zIndex = 10000;
 
-    // Popups on TOP of vessels (only when a popup is open)
-    map.getPane("popupPane").style.zIndex = 20000;
+  // Popups on TOP of vessels (only when a popup is open)
+  map.getPane("popupPane").style.zIndex = 20000;
 
-    const EncBusyBayGroup = L.layerGroup();
-    const EncAllLayerGroup = L.layerGroup();
+  const EncBusyBayGroup = L.layerGroup();
+  const EncAllLayerGroup = L.layerGroup();
 
-    // Ship Marker: vessels
-    function makePortVisitMarker(lat, lon) {
-      return L.circleMarker([lat, lon], {
-        radius: 12,
-        color: "#680093",
-        weight: 3,
-        fillColor: "#D5FC79",
-        fillOpacity: 1.0,
-        pane: "top-vessels"
-      });
+  // Ship Marker: vessels
+  function makePortVisitMarker(lat, lon) {
+    return L.circleMarker([lat, lon], {
+      radius: 12,
+      color: "#680093",
+      weight: 3,
+      fillColor: "#D5FC79",
+      fillOpacity: 1.0,
+      pane: "top-vessels"
+    });
+  }
+
+  // ENC GeoJSON layers
+  const encLayers = [
+    // Coastal
+    {
+      name: "Coastal Bridges",
+      file: "Coastal_Bridge_area_4326_clipTB.geojson",
+      label: "Bridge",
+      style: { color: "#ff00ff", weight: 2, fillColor: "#ff00ff", fillOpacity: 0.3 }
+    },
+    {
+      name: "Coastal Buoy Lateral",
+      file: "Coastal_Buoy_Lateral_point_4326_clipTB.geojson",
+      label: "Buoy",
+      pointClass: "buoy"
+    },
+    {
+      name: "Coastal Buoy Safe Water",
+      file: "Coastal_Buoy_Safe_Water_point_4326_clipTB.geojson",
+      label: "Buoy",
+      pointClass: "buoy"
+    },
+    {
+      name: "Coastal Fairway (clipped)",
+      file: "Coastal_Fairway_area_4326_clipTB.geojson",
+      label: "Ship Fairway",
+      style: { color: "#00ff00", weight: 2, fillColor: "#00ff00", fillOpacity: 0.2 },
+      busyBay: true
+    },
+    {
+      name: "Coastal Radar Transponder Beacons",
+      file: "Coastal_Radar_Transponder_Beacon_point_4326_clipTB.geojson",
+      label: "Beacon",
+      pointClass: "beacon",
+      busyBay: true
+    },
+    {
+      name: "Coastal Wrecks",
+      file: "Coastal_Wreck_point_4326_clipTB.geojson",
+      label: "Wreck",
+      pointClass: "wreck"
+    },
+
+    // General
+    {
+      name: "General Buoy Special Purpose",
+      file: "General_Buoy_Special_Purpose_General_point_4326_clipTB.geojson",
+      label: "Buoy",
+      pointClass: "buoy"
+    },
+    {
+      name: "General Obstructions",
+      file: "General_Obstruction_area_4326_clipTB.geojson",
+      label: "Obstruction",
+      style: { color: "#ff6600", weight: 2, fillColor: "#ff6600", fillOpacity: 0.25 }
+    },
+
+    // Harbour 1
+    {
+      name: "Harbour Buoy Special Purpose",
+      file: "Harbour_Buoy_Special_Purpose_General_point_4326_clipTB.geojson",
+      label: "Buoy",
+      pointClass: "buoy"
+    },
+    {
+      name: "Harbour Submarine Cables",
+      file: "Harbour_Cable_Submarine_line_4326_clipTB.geojson",
+      label: "Subsea Cable",
+      style: { color: "#00ffff", weight: 2 }
+    },
+    {
+      name: "Harbour Coastguard Stations",
+      file: "Harbour_Coastguard_Station_point_4326_clipTB.geojson",
+      label: "Military",
+      pointClass: "coastguard",
+      busyBay: true
+    },
+    {
+      name: "Harbour Coastline",
+      file: "Harbour_Coastline_line_4326_clipTB.geojson",
+      label: "Coastline",
+      style: { color: "#ffffff", weight: 1 }
+    },
+    {
+      name: "Harbour Fairways",
+      file: "Harbour_Fairway_area_4326_clipTB.geojson",
+      label: "Ship Fairway",
+      style: { color: "#0000ff", weight: 2, fillColor: "#0000ff", fillOpacity: 0.25 },
+      busyBay: true
+    },
+    {
+      name: "Harbour Fog Signals",
+      file: "Harbour_Fog_Signal_point_4326_clipTB.geojson",
+      label: "Fog Signal",
+      pointClass: "fog-signal",
+      busyBay: true
+    },
+    {
+      name: "Harbour Marine Farms",
+      file: "Harbour_Marine_Farm_Culture_area_4326_clipTB.geojson",
+      label: "Aqua Farm",
+      style: { color: "#00ff88", weight: 2, fillColor: "#00ff88", fillOpacity: 0.3 }
+    },
+    {
+      name: "Harbour Military Practice Areas",
+      file: "Harbour_Military_Practice_Area_4326_clipTB.geojson",
+      label: "Military",
+      style: { color: "#ff0000", weight: 2, fillColor: "#ff0000", fillOpacity: 0.2 },
+      busyBay: true
+    },
+
+    // Harbour 2
+    {
+      name: "Harbour Navigation Lines",
+      file: "Harbour_Navigation_Line_4326_clipTB.geojson",
+      label: "Navigation Line",
+      style: { color: "#00ffff", weight: 2 },
+      busyBay: true
+    },
+    {
+      name: "Harbour Obstructions",
+      file: "Harbour_Obstruction_area_4326_clipTB.geojson",
+      label: "Obstruction",
+      style: { color: "#ff3300", weight: 2, fillColor: "#ff3300", fillOpacity: 0.3 }
+    },
+    {
+      name: "Harbour Offshore Platforms",
+      file: "Harbour_Offshore_Platform_point_4326_clipTB.geojson",
+      label: "Offshore Platform",
+      pointClass: "offshore-platform"
+    },
+    {
+      name: "Harbour Radar Transponder Beacons",
+      file: "Harbour_Radar_Transponder_Beacon_point_4326_clipTB.geojson",
+      label: "Beacon",
+      pointClass: "beacon",
+      busyBay: true
+    },
+    {
+      name: "Harbour Wrecks",
+      file: "Harbour_Wreck_point_4326_clipTB.geojson",
+      label: "Wreck",
+      pointClass: "wreck"
+    },
+    {
+      name: "Overview Wrecks",
+      file: "Overview_Wreck_point_4326_clipTB.geojson",
+      label: "Wreck",
+      pointClass: "wreck"
     }
+  ];
 
-    // ENC GeoJSON layers
-    const encLayers = [
-      // Coastal
-      {
-        name: "Coastal Bridges",
-        file: "Coastal_Bridge_area_4326_clipTB.geojson",
-        label: "Bridge",
-        style: { color: "#ff00ff", weight: 2, fillColor: "#ff00ff", fillOpacity: 0.3 }
-      },
-      {
-        name: "Coastal Buoy Lateral",
-        file: "Coastal_Buoy_Lateral_point_4326_clipTB.geojson",
-        label: "Buoy",
-        pointClass: "buoy"
-      },
-      {
-        name: "Coastal Buoy Safe Water",
-        file: "Coastal_Buoy_Safe_Water_point_4326_clipTB.geojson",
-        label: "Buoy",
-        pointClass: "buoy"
-      },
-      {
-        name: "Coastal Fairway (clipped)",
-        file: "Coastal_Fairway_area_4326_clipTB.geojson",
-        label: "Ship Fairway",
-        style: { color: "#00ff00", weight: 2, fillColor: "#00ff00", fillOpacity: 0.2 },
-        busyBay: true
-      },
-      {
-        name: "Coastal Radar Transponder Beacons",
-        file: "Coastal_Radar_Transponder_Beacon_point_4326_clipTB.geojson",
-        label: "Beacon",
-        pointClass: "beacon",
-        busyBay: true
-      },
-      {
-        name: "Coastal Wrecks",
-        file: "Coastal_Wreck_point_4326_clipTB.geojson",
-        label: "Wreck",
-        pointClass: "wreck"
-      },
-
-      // General
-      {
-        name: "General Buoy Special Purpose",
-        file: "General_Buoy_Special_Purpose_General_point_4326_clipTB.geojson",
-        label: "Buoy",
-        pointClass: "buoy"
-      },
-      {
-        name: "General Obstructions",
-        file: "General_Obstruction_area_4326_clipTB.geojson",
-        label: "Obstruction",
-        style: { color: "#ff6600", weight: 2, fillColor: "#ff6600", fillOpacity: 0.25 }
-      },
-
-      // Harbour 1
-      {
-        name: "Harbour Buoy Special Purpose",
-        file: "Harbour_Buoy_Special_Purpose_General_point_4326_clipTB.geojson",
-        label: "Buoy",
-        pointClass: "buoy"
-      },
-      {
-        name: "Harbour Submarine Cables",
-        file: "Harbour_Cable_Submarine_line_4326_clipTB.geojson",
-        label: "Subsea Cable",
-        style: { color: "#00ffff", weight: 2 }
-      },
-      {
-        name: "Harbour Coastguard Stations",
-        file: "Harbour_Coastguard_Station_point_4326_clipTB.geojson",
-        label: "Military",
-        pointClass: "coastguard",
-        busyBay: true
-      },
-      {
-        name: "Harbour Coastline",
-        file: "Harbour_Coastline_line_4326_clipTB.geojson",
-        label: "Coastline",
-        style: { color: "#ffffff", weight: 1 }
-      },
-      {
-        name: "Harbour Fairways",
-        file: "Harbour_Fairway_area_4326_clipTB.geojson",
-        label: "Ship Fairway",
-        style: { color: "#0000ff", weight: 2, fillColor: "#0000ff", fillOpacity: 0.25 },
-        busyBay: true
-      },
-      {
-        name: "Harbour Fog Signals",
-        file: "Harbour_Fog_Signal_point_4326_clipTB.geojson",
-        label: "Fog Signal",
-        pointClass: "fog-signal",
-        busyBay: true
-      },
-      {
-        name: "Harbour Marine Farms",
-        file: "Harbour_Marine_Farm_Culture_area_4326_clipTB.geojson",
-        label: "Aqua Farm",
-        style: { color: "#00ff88", weight: 2, fillColor: "#00ff88", fillOpacity: 0.3 }
-      },
-      {
-        name: "Harbour Military Practice Areas",
-        file: "Harbour_Military_Practice_Area_4326_clipTB.geojson",
-        label: "Military",
-        style: { color: "#ff0000", weight: 2, fillColor: "#ff0000", fillOpacity: 0.2 },
-        busyBay: true
-      },
-
-      // Harbour 2
-      {
-        name: "Harbour Navigation Lines",
-        file: "Harbour_Navigation_Line_4326_clipTB.geojson",
-        label: "Navigation Line",
-        style: { color: "#00ffff", weight: 2 },
-        busyBay: true
-      },
-      {
-        name: "Harbour Obstructions",
-        file: "Harbour_Obstruction_area_4326_clipTB.geojson",
-        label: "Obstruction",
-        style: { color: "#ff3300", weight: 2, fillColor: "#ff3300", fillOpacity: 0.3 }
-      },
-      {
-        name: "Harbour Offshore Platforms",
-        file: "Harbour_Offshore_Platform_point_4326_clipTB.geojson",
-        label: "Offshore Platform",
-        pointClass: "offshore-platform"
-      },
-      {
-        name: "Harbour Radar Transponder Beacons",
-        file: "Harbour_Radar_Transponder_Beacon_point_4326_clipTB.geojson",
-        label: "Beacon",
-        pointClass: "beacon",
-        busyBay: true
-      },
-      {
-        name: "Harbour Wrecks",
-        file: "Harbour_Wreck_point_4326_clipTB.geojson",
-        label: "Wreck",
-        pointClass: "wreck"
-      },
-      {
-        name: "Overview Wrecks",
-        file: "Overview_Wreck_point_4326_clipTB.geojson",
-        label: "Wreck",
-        pointClass: "wreck"
-      }
-    ];
-
-    // ENC point symbology
-    function makePointMarker(pointClass, latlng) {
-      if (pointClass === "buoy") {
-        return L.circleMarker(latlng, {
-          radius: 5,
-          color: "#0432FF",
-          weight: 1,
-          fillColor: "#0432FF",
-          fillOpacity: 0.9
-        });
-      }
-
-      if (pointClass === "wreck") {
-        return L.marker(latlng, {
-          icon: L.divIcon({
-            className: "",
-            iconSize: [16, 16],
-            iconAnchor: [8, 8],
-            html: '<div style="color:#FF0000;font-size:18px;font-weight:bold;line-height:16px;">×</div>'
-          })
-        });
-      }
-
-      if (pointClass === "coastguard" || pointClass === "military") {
-        return L.marker(latlng, {
-          icon: L.divIcon({
-            className: "",
-            iconSize: [14, 14],
-            iconAnchor: [7, 7],
-            html: '<div style="width:14px;height:14px;background:#FFC000;"></div>'
-          })
-        });
-      }
-
-      if (pointClass === "fog-signal") {
-        return L.marker(latlng, {
-          icon: L.divIcon({
-            className: "",
-            iconSize: [14, 14],
-            iconAnchor: [7, 7],
-            html: '<div style="width:14px;height:14px;background:#FFFF2C;"></div>'
-          })
-        });
-      }
-
-      if (pointClass === "offshore-platform") {
-        return L.marker(latlng, {
-          icon: L.divIcon({
-            className: "",
-            iconSize: [14, 14],
-            iconAnchor: [7, 7],
-            html: '<div style="width:14px;height:14px;background:#D86DCD;"></div>'
-          })
-        });
-      }
-
+  // ENC point symbology
+  function makePointMarker(pointClass, latlng) {
+    if (pointClass === "buoy") {
       return L.circleMarker(latlng, {
         radius: 5,
-        color: "#ADADAD",
+        color: "#0432FF",
         weight: 1,
-        fillColor: "#ADADAD",
+        fillColor: "#0432FF",
         fillOpacity: 0.9
       });
     }
 
-    encLayers.forEach(cfg => {
-      fetch(cfg.file)
-        .then(r => r.json())
-        .then(data => {
-          console.log(cfg.name, "features:", data && data.features ? data.features.length : 0);
-
-          const layer = L.geoJSON(data, {
-            style: cfg.style,
-            pointToLayer: (feature, latlng) =>
-              cfg.pointClass ? makePointMarker(cfg.pointClass, latlng) : makePointMarker("default", latlng),
-            onEachFeature: (feature, layer) => {
-              layer.bindPopup('<div class="nole-popup-label">' + cfg.label + "</div>");
-            }
-          });
-
-          EncAllLayerGroup.addLayer(layer);
-          if (cfg.busyBay) {
-            EncBusyBayGroup.addLayer(layer);
-          }
+    if (pointClass === "wreck") {
+      return L.marker(latlng, {
+        icon: L.divIcon({
+          className: "",
+          iconSize: [16, 16],
+          iconAnchor: [8, 8],
+          html: '<div style="color:#FF0000;font-size:18px;font-weight:bold;line-height:16px;">×</div>'
         })
-        .catch(err => console.error("ENC load error:", cfg.name, err));
+      });
+    }
+
+    if (pointClass === "coastguard" || pointClass === "military") {
+      return L.marker(latlng, {
+        icon: L.divIcon({
+          className: "",
+          iconSize: [14, 14],
+          iconAnchor: [7, 7],
+          html: '<div style="width:14px;height:14px;background:#FFC000;"></div>'
+        })
+      });
+    }
+
+    if (pointClass === "fog-signal") {
+      return L.marker(latlng, {
+        icon: L.divIcon({
+          className: "",
+          iconSize: [14, 14],
+          iconAnchor: [7, 7],
+          html: '<div style="width:14px;height:14px;background:#FFFF2C;"></div>'
+        })
+      });
+    }
+
+    if (pointClass === "offshore-platform") {
+      return L.marker(latlng, {
+        icon: L.divIcon({
+          className: "",
+          iconSize: [14, 14],
+          iconAnchor: [7, 7],
+          html: '<div style="width:14px;height:14px;background:#D86DCD;"></div>'
+        })
+      });
+    }
+
+    return L.circleMarker(latlng, {
+      radius: 5,
+      color: "#ADADAD",
+      weight: 1,
+      fillColor: "#ADADAD",
+      fillOpacity: 0.9
     });
+  }
 
-    // Live GFW Port-Visit Vessels
-    const PROXY = "https://nole-gfw-proxy.asw5230.workers.dev";
-    const vesselsLayer = L.layerGroup().addTo(map);
+  encLayers.forEach(cfg => {
+    fetch(cfg.file)
+      .then(r => r.json())
+      .then(data => {
+        console.log(cfg.name, "features:", data && data.features ? data.features.length : 0);
 
-    function buildUrl() {
-      const minLat = 26.9;
-      const maxLat = 28.6;
-      const minLon = -83.2;
-      const maxLon = -81.9;
+        const layer = L.geoJSON(data, {
+          style: cfg.style,
+          pointToLayer: (feature, latlng) =>
+            cfg.pointClass ? makePointMarker(cfg.pointClass, latlng) : makePointMarker("default", latlng),
+          onEachFeature: (feature, layer) => {
+            layer.bindPopup('<div class="nole-popup-label">' + cfg.label + "</div>");
+          }
+        });
 
-      const bbox = [minLon, minLat, maxLon, maxLat].join(",");
-      console.log("Port visits bbox string:", bbox);
+        EncAllLayerGroup.addLayer(layer);
+        if (cfg.busyBay) {
+          EncBusyBayGroup.addLayer(layer);
+        }
+      })
+      .catch(err => console.error("ENC load error:", cfg.name, err));
+  });
 
-      return PROXY + "?bbox=" + encodeURIComponent(bbox) + "&limit=100";
+  // Live GFW Port-Visit Vessels
+  const PROXY = "https://nole-gfw-proxy.asw5230.workers.dev";
+  const vesselsLayer = L.layerGroup().addTo(map);
+
+  function buildUrl() {
+    const minLat = 26.9;
+    const maxLat = 28.6;
+    const minLon = -83.2;
+    const maxLon = -81.9;
+
+    const bbox = [minLon, minLat, maxLon, maxLat].join(",");
+    console.log("Port visits bbox string:", bbox);
+
+    return PROXY + "?bbox=" + encodeURIComponent(bbox) + "&limit=100";
+  }
+
+  // Tier selection
+  const SidebarHeader = document.querySelector("#NoleSidebar .nole-sidebar-header");
+  const TierCalm = document.getElementById("TierCalm");
+  const TierBusy = document.getElementById("TierBusy");
+  const TierActive = document.getElementById("TierActive");
+
+  function GetSelectedTierName() {
+    if (TierCalm.checked) return "Calm Coast";
+    if (TierBusy.checked) return "Busy Bay";
+    if (TierActive.checked) return "Active Adventures";
+    return "Calm Coast";
+  }
+
+  function OnTierChange() {
+    const TierName = GetSelectedTierName();
+    console.log("NOLE tier selected:", TierName);
+
+    if (SidebarHeader) {
+      SidebarHeader.textContent = "Choose your activity level.";
     }
 
-    // Tier selection 
-    const SidebarHeader = document.querySelector("#NoleSidebar .nole-sidebar-header");
-    const TierCalm = document.getElementById("TierCalm");
-    const TierBusy = document.getElementById("TierBusy");
-    const TierActive = document.getElementById("TierActive");
+    map.removeLayer(EncBusyBayGroup);
+    map.removeLayer(EncAllLayerGroup);
 
-    function GetSelectedTierName() {
-      if (TierCalm.checked) return "Calm Coast";
-      if (TierBusy.checked) return "Busy Bay";
-      if (TierActive.checked) return "Active Adventures";
-      return "Calm Coast";
+    if (TierName === "Busy Bay") {
+      EncBusyBayGroup.addTo(map);
     }
 
-    function OnTierChange() {
-      const TierName = GetSelectedTierName();
-      console.log("NOLE tier selected:", TierName);
-      if (SidebarHeader) {
-        SidebarHeader.textContent = "Choose your activity level.";
-      }
-
-      map.removeLayer(EncBusyBayGroup);
-      map.removeLayer(EncAllLayerGroup);
-
-      if (TierName === "Busy Bay") {
-        EncBusyBayGroup.addTo(map);
-      }
-
-      if (TierName === "Active Adventures") {
-        EncAllLayerGroup.addTo(map);
-      }
+    if (TierName === "Active Adventures") {
+      EncAllLayerGroup.addTo(map);
     }
+  }
 
-    TierCalm.addEventListener("change", OnTierChange);
-    TierBusy.addEventListener("change", OnTierChange);
-    TierActive.addEventListener("change", OnTierChange);
+  TierCalm.addEventListener("change", OnTierChange);
+  TierBusy.addEventListener("change", OnTierChange);
+  TierActive.addEventListener("change", OnTierChange);
 
-    // Confirm default sensory selection
-    OnTierChange();
+  // Confirm default sensory selection
+  OnTierChange();
 
-    // Sidebar minimize / expand toggle
+  // Sidebar minimize / expand toggle
+  // Note - attach handler on DOMContentLoaded to avoid timing issues
+  window.addEventListener("DOMContentLoaded", function () {
     const Sidebar = document.getElementById("NoleSidebar");
     const SidebarToggleBtn = document.getElementById("SidebarToggleBtn");
     const SidebarToggleIcon = document.getElementById("SidebarToggleIcon");
 
-    if (Sidebar && SidebarToggleBtn) {
-      SidebarToggleBtn.addEventListener("click", function (e) {
-        e.preventDefault();
-        e.stopPropagation();
-
-        const IsMinimized = Sidebar.classList.toggle("IsMinimized");
-
-        if (SidebarToggleIcon) {
-          SidebarToggleIcon.textContent = IsMinimized ? "▶" : "◀";
-        }
-
-        SidebarToggleBtn.setAttribute(
-          "aria-expanded",
-          IsMinimized ? "false" : "true"
-        );
-      });
-    }    
-    function fetchVessels() {
-      const url = buildUrl();
-      console.log("Fetching port visits via proxy:", url);
-
-      fetch(url)
-        .then(r => {
-          console.log("Port visits proxy response status:", r.status);
-          return r.json();
-        })
-        .then(data => {
-          console.log("Raw port visits JSON:", data);
-
-          vesselsLayer.clearLayers();
-
-          if (!Array.isArray(data.entries)) {
-            console.warn("No entries[] found in GFW response.");
-            return;
-          }
-
-          let count = 0;
-
-          data.entries.forEach(e => {
-            if (!e.position || e.position.lat == null || e.position.lon == null) return;
-
-            const lat = e.position.lat;
-            const lon = e.position.lon;
-
-            const marker = makePortVisitMarker(lat, lon);
-            // Hover highlight for vessels
-            const originalRadius = marker.options.radius;
-
-            marker.on("mouseover", function () {
-              this.setStyle({
-                radius: originalRadius + 4,
-                weight: 5
-              });
-              this.bringToFront();
-            });
-
-            marker.on("mouseout", function () {
-              this.setStyle({
-                radius: originalRadius,
-                weight: 3
-              });
-            });
-            const name =
-              (e.vessel && e.vessel.name && e.vessel.name.trim()) ||
-              "Name lost at sea";
-
-            const type = e.type || "port_visit";
-
-            marker.bindPopup(
-              '<div class="nole-popup-label">' + name + "</div>" +
-              "<div>Event: " + type + "</div>"
-            );
-
-            marker.addTo(vesselsLayer);
-            count++;
-          });
-
-          console.log("Port visit markers drawn:", count);
-        })
-        .catch(err => console.error("Port visit fetch error:", err));
+    if (!Sidebar || !SidebarToggleBtn) {
+      console.error("Sidebar toggle wiring failed:", { Sidebar, SidebarToggleBtn });
+      return;
     }
 
-    // Initial load + refresh every 60 seconds
-    fetchVessels();
-    setInterval(fetchVessels, 60000);
+    SidebarToggleBtn.addEventListener("click", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
 
-    L.control.layers(null, { "Live Port Visits": vesselsLayer }, { collapsed: true }).addTo(map);
-  </script>
+      const IsMinimized = Sidebar.classList.toggle("IsMinimized");
+
+      if (SidebarToggleIcon) {
+        SidebarToggleIcon.textContent = IsMinimized ? "▶" : "◀";
+      }
+
+      SidebarToggleBtn.setAttribute("aria-expanded", IsMinimized ? "false" : "true");
+      console.log("Sidebar minimized:", IsMinimized);
+    });
+  });
+
+  function fetchVessels() {
+    const url = buildUrl();
+    console.log("Fetching port visits via proxy:", url);
+
+    fetch(url)
+      .then(r => {
+        console.log("Port visits proxy response status:", r.status);
+        return r.json();
+      })
+      .then(data => {
+        console.log("Raw port visits JSON:", data);
+
+        vesselsLayer.clearLayers();
+
+        if (!Array.isArray(data.entries)) {
+          console.warn("No entries[] found in GFW response.");
+          return;
+        }
+
+        let count = 0;
+
+        data.entries.forEach(e => {
+          if (!e.position || e.position.lat == null || e.position.lon == null) return;
+
+          const lat = e.position.lat;
+          const lon = e.position.lon;
+
+          const marker = makePortVisitMarker(lat, lon);
+
+          // Hover highlight for vessels
+          const originalRadius = marker.options.radius;
+
+          marker.on("mouseover", function () {
+            this.setStyle({
+              radius: originalRadius + 4,
+              weight: 5
+            });
+            this.bringToFront();
+          });
+
+          marker.on("mouseout", function () {
+            this.setStyle({
+              radius: originalRadius,
+              weight: 3
+            });
+          });
+
+          const name =
+            (e.vessel && e.vessel.name && e.vessel.name.trim()) ||
+            "Name lost at sea";
+
+          const type = e.type || "port_visit";
+
+          marker.bindPopup(
+            '<div class="nole-popup-label">' + name + "</div>" +
+            "<div>Event: " + type + "</div>"
+          );
+
+          marker.addTo(vesselsLayer);
+          count++;
+        });
+
+        console.log("Port visit markers drawn:", count);
+      })
+      .catch(err => console.error("Port visit fetch error:", err));
+  }
+
+  // Initial load + refresh every 60 seconds
+  fetchVessels();
+  setInterval(fetchVessels, 60000);
+
+  L.control.layers(null, { "Live Port Visits": vesselsLayer }, { collapsed: true }).addTo(map);
+</script>
 </body>
 
 </html>
