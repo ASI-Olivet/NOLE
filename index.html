@@ -12,7 +12,7 @@
     crossorigin=""
   />
 
-  <style>
+<style>
   /* Base page + map */
   html,
   body,
@@ -48,7 +48,7 @@
     overflow: hidden;
   }
 
-  /* Toggle button (top-right inside sidebar) */
+  /* Toggle button  */
   #NoleSidebar .nole-sidebar-toggle {
     position: absolute;
     top: 10px;
@@ -62,10 +62,12 @@
     place-items: center;
     background: rgba(255, 255, 255, 0.85);
 
-    /* Make sure the arrow is actually visible */
+    /* Make arrow function event */
     color: #111;
     font-size: 18px;
     line-height: 1;
+    z-index: 50001;
+    pointer-events: auto;
   }
 
   /* Minimize */
@@ -74,19 +76,13 @@
     padding: 14px 8px;
   }
 
-  /* Hide */
+  /* Hide everything  */
   #NoleSidebar.IsMinimized > :not(.nole-sidebar-toggle) {
     opacity: 0;
     pointer-events: none;
   }
 
-  /* Gentle UI */
-  @media (prefers-reduced-motion: reduce) {
-    #NoleSidebar {
-      transition: none;
-    }
-  }
-
+  /* Sidebar header */
   #NoleSidebar .nole-sidebar-header {
     font-size: 16px;
     font-weight: 700;
@@ -139,9 +135,16 @@
     border-color: rgba(0, 0, 0, 0.45);
     background: rgba(255, 255, 255, 0.5);
   }
-</style>
-</head>
 
+  /* Gentle UI */
+  @media (prefers-reduced-motion: reduce) {
+    #NoleSidebar {
+      transition: none;
+    }
+  }
+</style>
+  
+</head>
 
 <body>
   <!-- Sensory selection sidebar -->
@@ -497,7 +500,7 @@
       const TierName = GetSelectedTierName();
       console.log("NOLE tier selected:", TierName);
       if (SidebarHeader) {
-        SidebarHeader.textContent = "Choose your activity level. (Selected: " + TierName + ")";
+        SidebarHeader.textContent = "Choose your activity level.";
       }
 
       map.removeLayer(EncBusyBayGroup);
