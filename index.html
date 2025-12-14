@@ -44,6 +44,45 @@
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
     }
 
+    /* Toggle button (top-right inside sidebar) */
+    #NoleSidebar .nole-sidebar-toggle {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 34px;
+      height: 34px;
+      border: 0;
+      border-radius: 10px;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      background: rgba(255, 255, 255, 0.85);
+    }
+
+    /* Gentle UI transition */
+    #NoleSidebar {
+      transition: width 160ms ease, opacity 160ms ease;
+      overflow: hidden;
+    }
+
+    /* Minimize */
+    #NoleSidebar.IsMinimized {
+      width: 50px;
+      padding: 14px 8px;
+    }
+
+    /* Hide */
+    #NoleSidebar.IsMinimized > :not(.nole-sidebar-toggle) {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* Gentle UI */
+    @media (prefers-reduced-motion: reduce) {
+    #NoleSidebar {
+      transition: none;
+      }
+    }    
     #NoleSidebar .nole-sidebar-header {
       font-size: 16px;
       font-weight: 700;
@@ -103,8 +142,9 @@
 <body>
   <!-- Sensory selection sidebar -->
   <div id="NoleSidebar" aria-label="NOLE activity level">
-    <div class="nole-sidebar-header">Choose your activity level.</div>
-
+    <button id="SidebarToggleBtn" class="nole-sidebar-toggle" type="button" aria-label="Minimize sidebar" aria-expanded="true">
+      <span id="SidebarToggleIcon" aria-hidden="true">◀</span>
+    </button>    <div class="nole-sidebar-header">Choose your activity level.</div>
     <div class="nole-tier">
       <label class="nole-tier-label">
         <input type="radio" name="NoleTier" id="TierCalm" checked />
