@@ -522,6 +522,28 @@
     // Confirm default sensory selection
     OnTierChange();
 
+    // Sidebar minimize / expand toggle
+    const Sidebar = document.getElementById("NoleSidebar");
+    const SidebarToggleBtn = document.getElementById("SidebarToggleBtn");
+    const SidebarToggleIcon = document.getElementById("SidebarToggleIcon");
+
+    if (Sidebar && SidebarToggleBtn) {
+      SidebarToggleBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const IsMinimized = Sidebar.classList.toggle("IsMinimized");
+
+        if (SidebarToggleIcon) {
+          SidebarToggleIcon.textContent = IsMinimized ? "▶" : "◀";
+        }
+
+        SidebarToggleBtn.setAttribute(
+          "aria-expanded",
+          IsMinimized ? "false" : "true"
+        );
+      });
+    }    
     function fetchVessels() {
       const url = buildUrl();
       console.log("Fetching port visits via proxy:", url);
