@@ -10,8 +10,7 @@
     href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
     crossorigin=""
   />
-
-  <style>
+    <style>
     /* Base page + map */
     html,
     body,
@@ -26,23 +25,22 @@
       font-size: 14px;
       font-weight: 600;
     }
-    
-    /* ID selector */
+
     #NoleSidebar {
       position: fixed;
       left: 12px;
       bottom: 12px;
       top: auto;
-      width: 33vw;
-      max-width: 420px;
+      width: 360px;
+      max-width: calc(100vw - 24px);
       padding: 14px;
       border-radius: 14px;
       background-color: #F3CAB5;
       box-shadow: 0 10px 22px rgba(0, 0, 0, 0.22);
       z-index: 40000;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
     }
 
-    /* Header */
     #NoleSidebar .nole-sidebar-header {
       font-size: 16px;
       font-weight: 700;
@@ -53,38 +51,47 @@
     #NoleSidebar .nole-tier {
       padding: 12px 10px;
       border-radius: 12px;
-      border: 1px solid rgba(0, 0, 0, 0.2);
+      border: 2px solid rgba(0, 0, 0, 0.18);
       margin-bottom: 12px;
-      background: rgba(255, 255, 255, 0.35);
+      background: rgba(255, 255, 255, 0.28);
     }
 
-    /* Radio + title row */
+    /* Make clickable */
     #NoleSidebar .nole-tier-label {
       display: flex;
       align-items: center;
       gap: 10px;
       cursor: pointer;
+      width: 100%;
     }
 
-    /* Tier title */
     #NoleSidebar .nole-tier-title {
       font-size: 15px;
       font-weight: 700;
     }
 
-    /* Tier description */
     #NoleSidebar .nole-tier-desc {
-      margin-left: 26px;
+      margin-left: 28px;
       margin-top: 6px;
       font-size: 13px;
       line-height: 1.3;
     }
 
-    /* Radio buttons */
     #NoleSidebar input[type="radio"] {
       width: 18px;
       height: 18px;
       cursor: pointer;
+      flex: 0 0 auto;
+    }
+
+  /* Select styling radio/text */
+    #NoleSidebar input[type="radio"]:checked + .nole-tier-title {
+      text-decoration: underline;
+    }
+
+    #NoleSidebar .nole-tier:focus-within {
+      border-color: rgba(0, 0, 0, 0.45);
+      background: rgba(255, 255, 255, 0.50);
     }
   </style>
 </head>
