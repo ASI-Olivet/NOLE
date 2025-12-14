@@ -13,129 +13,133 @@
   />
 
   <style>
-    /* Base page + map */
-    html,
-    body,
-    #map {
-      height: 100%;
-      margin: 0;
-      padding: 0;
-    }
+  /* Base page + map */
+  html,
+  body,
+  #map {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
 
-    /* Popups */
-    .nole-popup-label {
-      font-size: 14px;
-      font-weight: 600;
-    }
+  /* Popups */
+  .nole-popup-label {
+    font-size: 14px;
+    font-weight: 600;
+  }
 
-    /* Sidebar */
-    #NoleSidebar {
-      position: fixed;
-      left: 12px;
-      bottom: 12px;
-      top: auto;
-      width: 360px;
-      max-width: calc(100vw - 24px);
-      padding: 14px;
-      border-radius: 14px;
-      background-color: #F3CAB5;
-      box-shadow: 0 10px 22px rgba(0, 0, 0, 0.22);
-      z-index: 40000;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-    }
-
-    /* Toggle button (top-right inside sidebar) */
-    #NoleSidebar .nole-sidebar-toggle {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      width: 34px;
-      height: 34px;
-      border: 0;
-      border-radius: 10px;
-      cursor: pointer;
-      display: grid;
-      place-items: center;
-      background: rgba(255, 255, 255, 0.85);
-    }
+  /* Sidebar */
+  #NoleSidebar {
+    position: fixed;
+    left: 12px;
+    bottom: 12px;
+    top: auto;
+    width: 360px;
+    max-width: calc(100vw - 24px);
+    padding: 14px;
+    border-radius: 14px;
+    background-color: #F3CAB5;
+    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.22);
+    z-index: 40000;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
 
     /* Gentle UI transition */
-    #NoleSidebar {
-      transition: width 160ms ease, opacity 160ms ease;
-      overflow: hidden;
-    }
+    transition: width 160ms ease, opacity 160ms ease;
+    overflow: hidden;
+  }
 
-    /* Minimize */
-    #NoleSidebar.IsMinimized {
-      width: 50px;
-      padding: 14px 8px;
-    }
+  /* Toggle button (top-right inside sidebar) */
+  #NoleSidebar .nole-sidebar-toggle {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 34px;
+    height: 34px;
+    border: 0;
+    border-radius: 10px;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    background: rgba(255, 255, 255, 0.85);
 
-    /* Hide */
-    #NoleSidebar.IsMinimized > :not(.nole-sidebar-toggle) {
-      opacity: 0;
-      pointer-events: none;
-    }
+    /* Make sure the arrow is actually visible */
+    color: #111;
+    font-size: 18px;
+    line-height: 1;
+  }
 
-    /* Gentle UI */
-    @media (prefers-reduced-motion: reduce) {
+  /* Minimize */
+  #NoleSidebar.IsMinimized {
+    width: 50px;
+    padding: 14px 8px;
+  }
+
+  /* Hide */
+  #NoleSidebar.IsMinimized > :not(.nole-sidebar-toggle) {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* Gentle UI */
+  @media (prefers-reduced-motion: reduce) {
     #NoleSidebar {
       transition: none;
-      }
-    }    
-    #NoleSidebar .nole-sidebar-header {
-      font-size: 16px;
-      font-weight: 700;
-      margin-bottom: 12px;
     }
+  }
 
-    /* Tier containers */
-    #NoleSidebar .nole-tier {
-      padding: 12px 10px;
-      border-radius: 12px;
-      border: 2px solid rgba(0, 0, 0, 0.18);
-      margin-bottom: 12px;
-      background: rgba(255, 255, 255, 0.28);
-    }
+  #NoleSidebar .nole-sidebar-header {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
 
-    /* Make clickable */
-    #NoleSidebar .nole-tier-label {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      cursor: pointer;
-      width: 100%;
-    }
+  /* Tier containers */
+  #NoleSidebar .nole-tier {
+    padding: 12px 10px;
+    border-radius: 12px;
+    border: 2px solid rgba(0, 0, 0, 0.18);
+    margin-bottom: 12px;
+    background: rgba(255, 255, 255, 0.28);
+  }
 
-    #NoleSidebar .nole-tier-title {
-      font-size: 15px;
-      font-weight: 700;
-    }
+  /* Make clickable */
+  #NoleSidebar .nole-tier-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    width: 100%;
+  }
 
-    #NoleSidebar .nole-tier-desc {
-      margin-left: 28px;
-      margin-top: 6px;
-      font-size: 13px;
-      line-height: 1.3;
-    }
+  #NoleSidebar .nole-tier-title {
+    font-size: 15px;
+    font-weight: 700;
+  }
 
-    #NoleSidebar input[type="radio"] {
-      width: 18px;
-      height: 18px;
-      cursor: pointer;
-      flex: 0 0 auto;
-    }
+  #NoleSidebar .nole-tier-desc {
+    margin-left: 28px;
+    margin-top: 6px;
+    font-size: 13px;
+    line-height: 1.3;
+  }
 
-    /* Select styling radio/text */
-    #NoleSidebar input[type="radio"]:checked + .nole-tier-title {
-      text-decoration: underline;
-    }
+  #NoleSidebar input[type="radio"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    flex: 0 0 auto;
+  }
 
-    #NoleSidebar .nole-tier:focus-within {
-      border-color: rgba(0, 0, 0, 0.45);
-      background: rgba(255, 255, 255, 0.5);
-    }
-  </style>
+  /* Select styling radio/text */
+  #NoleSidebar input[type="radio"]:checked + .nole-tier-title {
+    text-decoration: underline;
+  }
+
+  #NoleSidebar .nole-tier:focus-within {
+    border-color: rgba(0, 0, 0, 0.45);
+    background: rgba(255, 255, 255, 0.5);
+  }
+</style>
 </head>
 
 
