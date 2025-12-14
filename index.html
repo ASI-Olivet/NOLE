@@ -436,7 +436,7 @@
       return PROXY + "?bbox=" + encodeURIComponent(bbox) + "&limit=100";
     }
 
-    // PSEUDOCODE (JavaScript): detect tier selection (no map changes yet)
+    // Tier selection 
     const SidebarHeader = document.querySelector("#NoleSidebar .nole-sidebar-header");
     const TierCalm = document.getElementById("TierCalm");
     const TierBusy = document.getElementById("TierBusy");
@@ -472,7 +472,7 @@
     TierBusy.addEventListener("change", OnTierChange);
     TierActive.addEventListener("change", OnTierChange);
 
-    // Confirm default state on load
+    // Confirm default sensory selection
     OnTierChange();
 
     function fetchVessels() {
@@ -503,7 +503,23 @@
             const lon = e.position.lon;
 
             const marker = makePortVisitMarker(lat, lon);
+            // Hover highlight for vessels
+            const originalRadius = marker.options.radius;
 
+            marker.on("mouseover", function () {
+              this.setStyle({
+                radius: originalRadius + 4,
+                weight: 5
+              });
+              this.bringToFront();
+            });
+
+            marker.on("mouseout", function () {
+              this.setStyle({
+                radius: originalRadius,
+                weight: 3
+              });
+            });
             const name =
               (e.vessel && e.vessel.name && e.vessel.name.trim()) ||
               "Name lost at sea";
